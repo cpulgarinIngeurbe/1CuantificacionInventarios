@@ -58,6 +58,11 @@ jobs:
             -m "- Total de registros: 256" \
             -m "- Actualizacion automatica por GitHub Actions"
 
+      - name: Pull antes de push
+        if: steps.verify.outputs.changed == 'true'
+        run: |
+          git pull origin ${{ github.ref_name }} --rebase || true
+
       - name: Push cambios
         if: steps.verify.outputs.changed == 'true'
         run: |
