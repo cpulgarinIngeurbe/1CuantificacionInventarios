@@ -2,6 +2,7 @@
 """
 Script para unificar todas las pestañas de un Excel en una sola.
 Valida primero que todas las pestañas tengan las mismas columnas.
+Resultado: guarda en carpeta 'transformacion/' sin modificar el original.
 """
 
 import pandas as pd
@@ -45,15 +46,12 @@ def validate_columns(excel_file):
         return False, None, None
 
 
-def merge_sheets(excel_file, output_file=None):
+def merge_sheets(input_excel, output_excel):
     """Unifica todas las pestañas en una sola."""
-    if output_file is None:
-        output_file = excel_file
-
     print("[INFO] Iniciando proceso de unificacion...\n")
 
     # Validar columnas
-    is_valid, sheet_names, columns = validate_columns(excel_file)
+    is_valid, sheet_names, columns = validate_columns(input_excel)
 
     if not is_valid:
         return False
@@ -63,7 +61,7 @@ def merge_sheets(excel_file, output_file=None):
     all_data = []
 
     for sheet_name in sheet_names:
-        df = pd.read_excel(excel_file, sheet_name=sheet_name)
+        df = pd.read_excel(input_excel, sheet_name=sheet_name)
         all_data.append(df)
         print(f"[+] {sheet_name}: {len(df)} filas")
 
@@ -71,10 +69,10 @@ def merge_sheets(excel_file, output_file=None):
     merged_df = pd.concat(all_data, ignore_index=True)
     print(f"\n[OK] Datos unificados: {len(merged_df)} filas totales\n")
 
-    # Guardar en nuevo archivo o reemplazar
-    print(f"[INFO] Guardando en: {output_file}")
+    # Guardar en archivo de salida
+    print(f"[INFO] Guardando en: {output_excel}")
 
-    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+    with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
         merged_df.to_excel(writer, sheet_name='DATOS_UNIFICADOS', index=False)
 
     print("[OK] Archivo guardado exitosamente.\n")
@@ -82,17 +80,23 @@ def merge_sheets(excel_file, output_file=None):
 
 
 if __name__ == "__main__":
-    # Ruta del archivo Excel
-    excel_file = Path(__file__).parent / "InformeInventario.xlsx"
+    # Rutas
+    repo_root = Path(__file__).parent
+    input_excel = repo_root / "InformeInventario.xlsx"
+    output_dir = repo_root / "transformacion"
+    output_excel = output_dir / "InformeInventario_Unificado.xlsx"
 
-    if not excel_file.exists():
-        print(f"[ERROR] Archivo no encontrado: {excel_file}")
+    # Crear directorio si no existe
+    output_dir.mkdir(exist_ok=True)
+
+    if not input_excel.exists():
+        print(f"[ERROR] Archivo no encontrado: {input_excel}")
         sys.exit(1)
 
-    success = merge_sheets(str(excel_file))
+    success = merge_sheets(str(input_excel), str(output_excel))
 
     if success:
-        print("[SUCCESS] Proceso completado exitosamente.")
+        print(f"[SUCCESS] Archivo generado en: transformacion/InformeInventario_Unificado.xlsx")
         sys.exit(0)
     else:
         print("[ERROR] El proceso falló.")

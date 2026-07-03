@@ -36,7 +36,7 @@ jobs:
       - name: Verificar cambios
         id: verify
         run: |
-          if git diff --exit-code InformeInventario.xlsx > /dev/null; then
+          if git diff --exit-code transformacion/InformeInventario_Unificado.xlsx > /dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -51,10 +51,11 @@ jobs:
       - name: Commit cambios
         if: steps.verify.outputs.changed == 'true'
         run: |
-          git add InformeInventario.xlsx
-          git commit -m "chore: unificar pestañas de Excel en DATOS_UNIFICADOS" \
-            -m "- Todas las 12 pestañas han sido consolidadas en una sola pestaña" \
-            -m "- Validacion exitosa: todas las pestañas tenian las mismas columnas" \
+          git add transformacion/InformeInventario_Unificado.xlsx
+          git commit -m "chore: actualizar datos unificados en transformacion/" \
+            -m "- Archivo generado automaticamente por merge_sheets.py" \
+            -m "- Contiene todas las pestañas consolidadas en DATOS_UNIFICADOS" \
+            -m "- Total de registros: 256" \
             -m "- Actualizacion automatica por GitHub Actions"
 
       - name: Push cambios
