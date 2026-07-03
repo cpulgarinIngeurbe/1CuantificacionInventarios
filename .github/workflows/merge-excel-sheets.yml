@@ -6,7 +6,7 @@ on:
       - main
       - master
     paths:
-      - 'InformeInventario.xlsx'
+      - 'datos/InformeInventario.xlsx'
   workflow_dispatch:
 
 permissions:

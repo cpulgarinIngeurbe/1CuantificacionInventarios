@@ -82,7 +82,7 @@ def merge_sheets(input_excel, output_excel):
 if __name__ == "__main__":
     # Rutas
     repo_root = Path(__file__).parent
-    input_excel = repo_root / "InformeInventario.xlsx"
+    input_excel = repo_root / "datos" / "InformeInventario.xlsx"
     output_dir = repo_root / "transformacion"
     output_excel = output_dir / "InformeInventario_Unificado.xlsx"
 
