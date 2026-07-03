@@ -33,37 +33,7 @@ jobs:
       - name: Ejecutar script de unificación
         run: python merge_sheets.py
 
-      - name: Verificar cambios
-        id: verify
+      - name: Mostrar resultado
         run: |
-          if git diff --exit-code transformacion/InformeInventario_Unificado.xlsx > /dev/null; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Configurar Git
-        if: steps.verify.outputs.changed == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-      - name: Commit cambios
-        if: steps.verify.outputs.changed == 'true'
-        run: |
-          git add transformacion/InformeInventario_Unificado.xlsx
-          git commit -m "chore: actualizar datos unificados en transformacion/" \
-            -m "- Archivo generado automaticamente por merge_sheets.py" \
-            -m "- Contiene todas las pestañas consolidadas en DATOS_UNIFICADOS" \
-            -m "- Total de registros: 256" \
-            -m "- Actualizacion automatica por GitHub Actions"
-
-      - name: Pull antes de push
-        if: steps.verify.outputs.changed == 'true'
-        run: |
-          git pull origin ${{ github.ref_name }} --rebase || true
-
-      - name: Push cambios
-        if: steps.verify.outputs.changed == 'true'
-        run: |
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
+          echo "✓ Archivo procesado exitosamente"
+          echo "Ruta: transformacion/InformeInventario_Unificado.xlsx"
