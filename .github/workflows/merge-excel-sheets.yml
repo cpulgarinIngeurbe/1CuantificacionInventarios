@@ -49,11 +49,10 @@ jobs:
         if: steps.verify.outputs.changed == 'true'
         run: |
           git add InformeInventario.xlsx
-          git commit -m "chore: unificar pestañas de Excel en DATOS_UNIFICADOS
-
-- Todas las 12 pestañas han sido consolidadas en una sola pestaña
-- Validación exitosa: todas las pestañas tenían las mismas columnas
-- Total de registros unificados: $(python -c \"import pandas as pd; print(len(pd.read_excel('InformeInventario.xlsx')))\")"
+          git commit -m "chore: unificar pestañas de Excel en DATOS_UNIFICADOS" \
+            -m "- Todas las 12 pestañas han sido consolidadas en una sola pestaña" \
+            -m "- Validacion exitosa: todas las pestañas tenian las mismas columnas" \
+            -m "- Actualizacion automatica por GitHub Actions"
 
       - name: Push cambios
         if: steps.verify.outputs.changed == 'true'
