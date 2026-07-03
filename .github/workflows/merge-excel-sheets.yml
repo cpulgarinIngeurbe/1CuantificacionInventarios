@@ -33,7 +33,22 @@ jobs:
       - name: Ejecutar script de unificación
         run: python merge_sheets.py
 
-      - name: Mostrar resultado
+      - name: Configurar Git
         run: |
-          echo "✓ Archivo procesado exitosamente"
-          echo "Ruta: transformacion/InformeInventario_Unificado.xlsx"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit resultado
+        run: |
+          if git diff --exit-code transformacion/InformeInventario_Unificado.xlsx > /dev/null 2>&1; then
+            echo "Sin cambios en el archivo"
+          else
+            git add transformacion/InformeInventario_Unificado.xlsx
+            git commit -m "chore: actualizar datos unificados" \
+              -m "Generado automaticamente por merge_sheets.py"
+          fi
+
+      - name: Pull y Push
+        run: |
+          git pull origin ${{ github.ref_name }} --rebase || true
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }} || echo "No hay cambios para pushear"
