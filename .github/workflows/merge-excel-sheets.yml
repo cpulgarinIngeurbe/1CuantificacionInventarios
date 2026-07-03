@@ -9,6 +9,9 @@ on:
       - 'InformeInventario.xlsx'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   merge-sheets:
     runs-on: ubuntu-latest
