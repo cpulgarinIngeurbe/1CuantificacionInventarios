@@ -1,11 +1,10 @@
 name: Generar HTML
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'transformacion/InformeInventario_Unificado.xlsx'
+  workflow_run:
+    workflows: ["Unificar Pestañas Excel"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -14,6 +13,7 @@ permissions:
 jobs:
   generate-html:
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
 
     steps:
       - name: Checkout codigo
@@ -29,6 +29,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas openpyxl
 
+      - name: Esperar a que el archivo exista
+        run: |
+          for i in {1..30}; do
+            if [ -f "transformacion/InformeInventario_Unificado.xlsx" ]; then
+              echo "Archivo encontrado"
+              exit 0
+            fi
+            echo "Intento $i/30: esperando archivo..."
+            sleep 2
+          done
+          echo "Archivo no encontrado después de 60 segundos"
+          exit 1
+
       - name: Ejecutar script de HTML
         run: python generate_html.py
 
@@ -43,13 +56,12 @@ jobs:
             echo "Sin cambios en el archivo"
           else
             git add index.html
-            git commit -m "chore: actualizar index.html
-
-- Generado automaticamente desde transformacion/InformeInventario_Unificado.xlsx
-- Tabla actualizada con los datos consolidados"
+            git commit -m "chore: actualizar index.html" \
+              -m "Generado automaticamente desde transformacion/InformeInventario_Unificado.xlsx" \
+              -m "Tabla actualizada con los datos consolidados"
           fi
 
       - name: Pull y Push
         run: |
-          git pull origin ${{ github.ref_name }} --rebase || true
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }} || echo "No hay cambios para pushear"
+          git pull origin ${{ github.ref }} --rebase || true
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }} || echo "No hay cambios para pushear"
