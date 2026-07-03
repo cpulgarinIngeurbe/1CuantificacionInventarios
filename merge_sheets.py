@@ -27,9 +27,9 @@ def read_sheet_with_double_header(excel_file, sheet_name):
         col_name1 = row1[i] if pd.notna(row1[i]) else ""
         col_name2 = row2[i] if pd.notna(row2[i]) else ""
 
-        # Si ambas tienen valor, concatenar con guión
+        # Si ambas tienen valor, concatenar con espacio
         if col_name1 and col_name2:
-            new_col = f"{col_name1} - {col_name2}"
+            new_col = f"{col_name1} {col_name2}"
         # Si solo la primera tiene valor
         elif col_name1:
             new_col = str(col_name1)
