@@ -52,13 +52,14 @@ jobs:
 
       - name: Commit HTML
         run: |
-          if git diff --exit-code index.html > /dev/null 2>&1; then
-            echo "Sin cambios en el archivo"
-          else
+          if [ -f "index.html" ]; then
             git add index.html
             git commit -m "chore: actualizar index.html" \
               -m "Generado automaticamente desde transformacion/InformeInventario_Unificado.xlsx" \
-              -m "Tabla actualizada con los datos consolidados"
+              -m "Tabla actualizada con los datos consolidados" || echo "Sin cambios nuevos"
+          else
+            echo "Error: index.html no fue generado"
+            exit 1
           fi
 
       - name: Pull y Push
