@@ -121,7 +121,45 @@ def merge_sheets(input_excel, output_excel):
     with pd.ExcelWriter(output_excel, engine='openpyxl') as writer:
         merged_df.to_excel(writer, sheet_name='DATOS_UNIFICADOS', index=False)
 
-    print("[OK] Archivo guardado exitosamente.\n")
+    # Aplicar formato de moneda a columnas especificadas
+    from openpyxl.styles import numbers
+
+    wb = openpyxl.load_workbook(output_excel)
+    ws = wb['DATOS_UNIFICADOS']
+
+    # Columnas que deben tener formato de dinero
+    money_columns = [
+        'Inventario Inicial',
+        'Entradas Almacén',
+        'Entradas por Traslados',
+        'Reintegros Obra',
+        'Salidas Almacén',
+        'Salidas por Traslados',
+        'Devoluciones Proveedor',
+        'Devoluciones Valor',
+        'Ajustes Inventario',
+        'Salidas Bodega',
+        'Entradas Bodega',
+        'Inventario Final'
+    ]
+
+    # Obtener índices de columnas
+    column_indices = {}
+    for col_idx, cell in enumerate(ws[1], 1):
+        if cell.value in money_columns:
+            column_indices[cell.value] = col_idx
+
+    # Aplicar formato de moneda (pesos colombianos)
+    currency_format = '#,##0.00'
+
+    for col_name, col_idx in column_indices.items():
+        for row in range(2, ws.max_row + 1):  # Comenzar desde fila 2 (datos)
+            cell = ws.cell(row=row, column=col_idx)
+            cell.number_format = currency_format
+
+    wb.save(output_excel)
+
+    print("[OK] Archivo guardado con formato de dinero.\n")
     return True
 
 
