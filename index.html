@@ -1,0 +1,470 @@
+<!DOCTYPE html><html class="light" lang="es" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Executive Construction BI - Project Matrix</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "verde-profundo": "#2e3a14",
+                        "surface-container-highest": "#e3e4d2",
+                        "on-tertiary-fixed": "#330045",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#3d4d00",
+                        "primary-container": "#a2c617",
+                        "turquesa": "#6aa0ac",
+                        "surface-variant": "#e3e4d2",
+                        "secondary-fixed": "#e6e0ea",
+                        "on-surface-variant": "#55525a",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b0d42a",
+                        "on-secondary-fixed-variant": "#48454d",
+                        "primary": "#a2c617",
+                        "background": "#fafbe8",
+                        "secondary-container": "#e6e0ea",
+                        "verde-medio": "#758b29",
+                        "bg-suave": "#f7f8f1",
+                        "verde-oscuro": "#4a5720",
+                        "on-error-container": "#93000a",
+                        "sig-verde": "#89c22e",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#605d65",
+                        "outline-variant": "#c5c9af",
+                        "surface": "#fafbe8",
+                        "on-secondary-container": "#66636b",
+                        "inverse-on-surface": "#f1f2e0",
+                        "verde-claro": "#dde387",
+                        "on-secondary-fixed": "#1c1b21",
+                        "petroleo-oscuro": "#0e2530",
+                        "surface-container": "#eeefdd",
+                        "on-background": "#1a1d12",
+                        "on-tertiary-fixed-variant": "#6b2883",
+                        "sig-naranja": "#f38117",
+                        "primary-fixed-dim": "#b0d42a",
+                        "surface-container-high": "#e8e9d8",
+                        "on-tertiary-container": "#6d2a85",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#85419d",
+                        "secondary-fixed-dim": "#cac5ce",
+                        "surface-dim": "#dadbca",
+                        "inverse-surface": "#2f3226",
+                        "on-primary-container": "#3f4f00",
+                        "naranja": "#dba444",
+                        "surface-tint": "#a2c617",
+                        "tertiary-container": "#e89cff",
+                        "tertiary-fixed": "#fad7ff",
+                        "primary-fixed": "#cbf147",
+                        "tertiary-fixed-dim": "#eeb0ff",
+                        "on-primary-fixed": "#171e00",
+                        "surface-container-low": "#f4f5e3",
+                        "morado": "#81398d",
+                        "outline": "#757963",
+                        "surface-bright": "#fafbe8",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1a1d12",
+                        "petroleo": "#163544",
+                        "gris-corp": "#55525a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "micro": "4px",
+                        "gutter": "16px",
+                        "container": "48px",
+                        "section": "32px",
+                        "panel": "24px",
+                        "component": "16px",
+                        "base": "4px",
+                        "margin-desktop": "40px",
+                        "card-padding": "24px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "sans": ["Roboto", "sans-serif"],
+                        "headline-sm": ["Roboto"],
+                        "headline-lg": ["Roboto"],
+                        "body-md": ["Roboto"],
+                        "label-eyebrow": ["Roboto"],
+                        "headline-lg-mobile": ["Roboto"],
+                        "body-lg": ["Roboto"],
+                        "headline-md": ["Roboto"],
+                        "caption": ["Roboto"],
+                        "display-hero": ["Roboto"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["24px", {"lineHeight": "1.25", "fontWeight": "500"}],
+                        "headline-lg": ["38px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-eyebrow": ["12px", {"lineHeight": "1.1", "letterSpacing": "0.18em", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["30px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-md": ["30px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "1.65", "fontWeight": "400"}],
+                        "display-hero": ["88px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Roboto', sans-serif; }
+        .progress-line-container {
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 10;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -2px;
+            z-index: 20;
+        }
+        .bar-transition {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), height 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cell-fixed-height {
+            height: 140px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .chart-mini {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .matrix-row:hover .project-cell {
+            background-color: var(--tw-bg-opacity);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .bg-corp-gradient {
+            background: linear-gradient(135deg, #2e3a14 0%, #4a5720 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-verde-profundo bg-corp-gradient sticky top-0 z-50 border-b border-white/10 shadow-lg w-full">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">Cuantificación de inventarios</span>
+<nav class="hidden md:flex gap-6">
+</nav>
+</div>
+</div>
+</header>
+<div class="flex min-h-screen max-w-[1920px] mx-auto">
+<!-- SideNavBar -->
+<!-- Main Content Canvas -->
+<main class="flex-1 p-margin-desktop mx-auto w-full">
+<!-- Header Section -->
+<section class="mb-8">
+<h1 class="font-headline-lg text-verde-profundo mb-1">Cuantificación de Inventarios con respecto al Avance de Proyectos</h1>
+<p class="font-body-lg text-gris-corp">Periodo Analizado: Enero – Diciembre 2026</p>
+</section>
+<!-- KPI Row -->
+
+<!-- Filters Bar -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4 shadow-sm">
+<div class="flex-1 flex flex-wrap gap-3">
+<div class="relative">
+<select id="projectFilter" class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-sm focus:ring-2 focus:ring-primary outline-none cursor-pointer text-gris-corp">
+<option>Project: All Projects</option>
+<option>ALBURA</option>
+<option>CORTEZZA</option>
+<option>FLORA</option>
+<option>MADERO</option>
+<option>NATIVA</option>
+<option>PIAZZA</option>
+<option>RESERVA DEL LAGO</option>
+<option>TERRA</option>
+<option>VIALE</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-gris-corp pointer-events-none">expand_more</span>
+</div>
+<div class="relative">
+<select id="yearFilter" class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-sm focus:ring-2 focus:ring-primary outline-none cursor-pointer text-gris-corp">
+<option>Año: All Years</option>
+<option selected>2026</option>
+<option>2025</option>
+<option>2024</option>
+<option>2023</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-gris-corp pointer-events-none">expand_more</span>
+</div>
+</div>
+<button class="bg-surface-container-high border border-outline-variant px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-surface-container-highest transition-colors text-gris-corp font-bold text-sm">
+<span class="material-symbols-outlined text-[18px]">filter_alt</span>
+More Filters
+</button>
+<button class="bg-primary text-verde-profundo px-6 py-2 rounded-lg font-bold hover:brightness-95 shadow-sm">Apply View</button>
+</section>
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-12">
+<div id="charts-container"></div>
+</section>
+
+<!-- Legend -->
+<!-- Legend -->
+<div class="bg-surface-container-low px-margin-desktop py-4 border-t border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-4 h-3 bg-primary rounded-sm"></div>
+<span class="text-xs font-bold text-gris-corp">Mensual Inventory</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full border-2 border-verde-profundo"></div>
+<span class="text-xs font-bold text-gris-corp">Progress Milestone</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-low border-t border-outline-variant py-8 px-margin-desktop mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center w-full max-w-[1920px] mx-auto gap-4">
+<p class="text-sm text-gris-corp">© 2026 Ingeurbe Construction Analytics | Data Refreshed: 15m ago</p>
+<div class="flex gap-6">
+<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Privacy Policy</a>
+<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Terms of Service</a>
+<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Inventory Methodology</a>
+<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">API Status</a>
+</div>
+</div>
+</footer>
+<script>
+// Datos de proyectos (extraídos del HTML)
+const proyectosData = {
+    'ALBURA': {
+        valores: [17778586.91, 284263503.71, 171403914.82, 1703290474.79, 578504192.34, 190747595.60, 0, 0, 0, 0, 0, 0],
+        avance: [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
+        icon: 'eco'
+    },
+    'CORTEZZA': {
+        valores: [819429427.80, 1404047788.45, 1997871769.53, 776782619.91, 0, 0, 0, 0, 0, 0, 0, 0],
+        avance: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        icon: 'grass'
+    },
+    'FLORA': {
+        valores: [546719219.55, 759935783.89, 1116054019.57, 1608772256.40, 2693103473.81, 2112129498.69, 0, 0, 0, 0, 0, 0],
+        avance: [16, 19, 23, 26, 29, 31, 0, 0, 0, 0, 0, 0],
+        icon: 'leaf'
+    },
+    'MADERO': {
+        valores: [884603626.59, 971831232.35, 950971227.49, 1020929910.30, 1101317599.28, 1109121866.09, 0, 0, 0, 0, 0, 0],
+        avance: [63, 68, 75, 82, 86, 91, 0, 0, 0, 0, 0, 0],
+        icon: 'lumber'
+    },
+    'NATIVA': {
+        valores: [914267589.60, 794126278.41, 907730254.92, 530185173.81, 2898619602.94, 1580434245.93, 0, 0, 0, 0, 0, 0],
+        avance: [3, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0],
+        icon: 'eco'
+    },
+    'PIAZZA': {
+        valores: [0, 0, 927256719.13, 33727591.92, 747562006.44, 157759974.20, 0, 0, 0, 0, 0, 0],
+        avance: [0, 0, 1, 2, 3, 3, 0, 0, 0, 0, 0, 0],
+        icon: 'location_city'
+    },
+    'RESERVA DEL LAGO': {
+        valores: [1252191558.22, 934167135.58, 877354449.23, 694278844.22, 671502088.17, 658004411.32, 0, 0, 0, 0, 0, 0],
+        avance: [74, 77, 79, 83, 89, 92, 0, 0, 0, 0, 0, 0],
+        icon: 'water'
+    },
+    'TERRA': {
+        valores: [764656363.49, 594015737.09, 630227491.99, 571539239.07, 613172030.81, 557607254.72, 0, 0, 0, 0, 0, 0],
+        avance: [60, 64, 70, 77, 82, 87, 0, 0, 0, 0, 0, 0],
+        icon: 'public'
+    },
+    'VIALE': {
+        valores: [414018561.81, 591217884.66, 1291749462.82, 940626714.36, 0, 0, 0, 0, 0, 0, 0, 0],
+        avance: [9, 12, 15, 20, 0, 0, 0, 0, 0, 0, 0, 0],
+        icon: 'directions'
+    }
+};
+
+const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+
+function createProjectChart(projectName, data) {
+    // Escalar valores a miles de millones (COP) para legibilidad
+    const scaleDivisor = 1000000000;
+    const monthlyValues = data.valores.map(v => v / scaleDivisor);
+
+    const container = document.getElementById('charts-container');
+    
+    // Crear sección para el proyecto
+    const section = document.createElement('div');
+    section.className = 'border-b border-outline-variant p-6 last:border-b-0';
+    section.dataset.project = projectName;
+    section.dataset.year = '2026';
+    
+    // Header del proyecto
+    const header = document.createElement('div');
+    header.className = 'flex items-center gap-3 mb-4';
+    header.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">eco</span>
+        </div>
+        <div>
+            <p class="font-bold text-verde-profundo text-sm uppercase">${projectName}</p>
+            <p class="text-xs text-gris-corp">Año 2026</p>
+        </div>
+    `;
+    
+    // Contenedor con altura FIJA (crítico para Chart.js responsive)
+    const chartWrapper = document.createElement('div');
+    chartWrapper.style.position = 'relative';
+    chartWrapper.style.height = '220px';
+    chartWrapper.style.width = '100%';
+    
+    // Canvas para gráfico
+    const canvas = document.createElement('canvas');
+    canvas.id = `chart-${projectName}`;
+    chartWrapper.appendChild(canvas);
+    
+    section.appendChild(header);
+    section.appendChild(chartWrapper);
+    container.appendChild(section);
+    
+    // Crear gráfico
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Avance (%)',
+                    data: data.avance,
+                    backgroundColor: '#22c55e',
+                    borderRadius: 4,
+                    yAxisID: 'y',
+                    order: 2
+                },
+                {
+                    label: 'Valor (Miles de Millones COP)',
+                    data: monthlyValues,
+                    type: 'line',
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    borderWidth: 3,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#3b82f6',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    yAxisID: 'y1',
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { padding: 15, font: { size: 11, weight: 'bold' } }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        afterLabel: function(context) {
+                            if (context.datasetIndex === 1) {
+                                const valor = data.valores[context.dataIndex];
+                                return `$ ${valor.toLocaleString('es-CO')}`;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    position: 'left',
+                    title: { display: true, text: 'Avance (%)', font: { weight: 'bold' } },
+                    max: 100,
+                    ticks: { callback: v => v + '%' }
+                },
+                y1: {
+                    position: 'right',
+                    title: { display: true, text: 'Miles de Millones COP', font: { weight: 'bold' } },
+                    grid: { drawOnChartArea: false },
+                    beginAtZero: true,
+                    ticks: {
+                        callback: v => v.toFixed(1) + 'B'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Generar gráficos cuando cargue
+window.addEventListener('DOMContentLoaded', () => {
+    Object.keys(proyectosData).forEach(project => {
+        createProjectChart(project, proyectosData[project]);
+    });
+    applyFilters();
+});
+
+// Filtros
+const projectFilter = document.getElementById('projectFilter');
+const yearFilter = document.getElementById('yearFilter');
+
+function applyFilters() {
+    const selectedProject = projectFilter.value;
+    const selectedYear = yearFilter.value;
+    const sections = document.querySelectorAll('#charts-container > div');
+    
+    sections.forEach(section => {
+        const projName = section.dataset.project;
+        const year = section.dataset.year;
+        
+        let show = true;
+        
+        if (selectedProject !== 'Project: All Projects' && projName !== selectedProject) {
+            show = false;
+        }
+        
+        if (show && selectedYear !== 'Año: All Years' && year !== selectedYear) {
+            show = false;
+        }
+        
+        section.style.display = show ? 'block' : 'none';
+    });
+}
+
+if (projectFilter) projectFilter.addEventListener('change', applyFilters);
+if (yearFilter) yearFilter.addEventListener('change', applyFilters);
+</script>
+</body></html>
