@@ -1,470 +1,1365 @@
-<!DOCTYPE html><html class="light" lang="es" style=""><head>
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Executive Construction BI - Project Matrix</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-tertiary": "#ffffff",
-                        "verde-profundo": "#2e3a14",
-                        "surface-container-highest": "#e3e4d2",
-                        "on-tertiary-fixed": "#330045",
-                        "on-error": "#ffffff",
-                        "on-primary-fixed-variant": "#3d4d00",
-                        "primary-container": "#a2c617",
-                        "turquesa": "#6aa0ac",
-                        "surface-variant": "#e3e4d2",
-                        "secondary-fixed": "#e6e0ea",
-                        "on-surface-variant": "#55525a",
-                        "error-container": "#ffdad6",
-                        "inverse-primary": "#b0d42a",
-                        "on-secondary-fixed-variant": "#48454d",
-                        "primary": "#a2c617",
-                        "background": "#fafbe8",
-                        "secondary-container": "#e6e0ea",
-                        "verde-medio": "#758b29",
-                        "bg-suave": "#f7f8f1",
-                        "verde-oscuro": "#4a5720",
-                        "on-error-container": "#93000a",
-                        "sig-verde": "#89c22e",
-                        "surface-container-lowest": "#ffffff",
-                        "secondary": "#605d65",
-                        "outline-variant": "#c5c9af",
-                        "surface": "#fafbe8",
-                        "on-secondary-container": "#66636b",
-                        "inverse-on-surface": "#f1f2e0",
-                        "verde-claro": "#dde387",
-                        "on-secondary-fixed": "#1c1b21",
-                        "petroleo-oscuro": "#0e2530",
-                        "surface-container": "#eeefdd",
-                        "on-background": "#1a1d12",
-                        "on-tertiary-fixed-variant": "#6b2883",
-                        "sig-naranja": "#f38117",
-                        "primary-fixed-dim": "#b0d42a",
-                        "surface-container-high": "#e8e9d8",
-                        "on-tertiary-container": "#6d2a85",
-                        "on-primary": "#ffffff",
-                        "tertiary": "#85419d",
-                        "secondary-fixed-dim": "#cac5ce",
-                        "surface-dim": "#dadbca",
-                        "inverse-surface": "#2f3226",
-                        "on-primary-container": "#3f4f00",
-                        "naranja": "#dba444",
-                        "surface-tint": "#a2c617",
-                        "tertiary-container": "#e89cff",
-                        "tertiary-fixed": "#fad7ff",
-                        "primary-fixed": "#cbf147",
-                        "tertiary-fixed-dim": "#eeb0ff",
-                        "on-primary-fixed": "#171e00",
-                        "surface-container-low": "#f4f5e3",
-                        "morado": "#81398d",
-                        "outline": "#757963",
-                        "surface-bright": "#fafbe8",
-                        "error": "#ba1a1a",
-                        "on-secondary": "#ffffff",
-                        "on-surface": "#1a1d12",
-                        "petroleo": "#163544",
-                        "gris-corp": "#55525a"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "micro": "4px",
-                        "gutter": "16px",
-                        "container": "48px",
-                        "section": "32px",
-                        "panel": "24px",
-                        "component": "16px",
-                        "base": "4px",
-                        "margin-desktop": "40px",
-                        "card-padding": "24px",
-                        "stack-md": "16px"
-                    },
-                    "fontFamily": {
-                        "sans": ["Roboto", "sans-serif"],
-                        "headline-sm": ["Roboto"],
-                        "headline-lg": ["Roboto"],
-                        "body-md": ["Roboto"],
-                        "label-eyebrow": ["Roboto"],
-                        "headline-lg-mobile": ["Roboto"],
-                        "body-lg": ["Roboto"],
-                        "headline-md": ["Roboto"],
-                        "caption": ["Roboto"],
-                        "display-hero": ["Roboto"]
-                    },
-                    "fontSize": {
-                        "headline-sm": ["24px", {"lineHeight": "1.25", "fontWeight": "500"}],
-                        "headline-lg": ["38px", {"lineHeight": "1.25", "fontWeight": "700"}],
-                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                        "label-eyebrow": ["12px", {"lineHeight": "1.1", "letterSpacing": "0.18em", "fontWeight": "700"}],
-                        "headline-lg-mobile": ["30px", {"lineHeight": "1.25", "fontWeight": "700"}],
-                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                        "headline-md": ["30px", {"lineHeight": "1.25", "fontWeight": "700"}],
-                        "caption": ["12px", {"lineHeight": "1.65", "fontWeight": "400"}],
-                        "display-hero": ["88px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "900"}]
-                    }
-                },
-            },
-        }
-    </script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuantificación de Inventarios — Ingeurbe 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-        body { font-family: 'Roboto', sans-serif; }
-        .progress-line-container {
-            position: absolute;
-            bottom: 4px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            z-index: 10;
-        }
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            position: absolute;
-            bottom: -2px;
-            z-index: 20;
-        }
-        .bar-transition {
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1), height 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .cell-fixed-height {
-            height: 140px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        .chart-mini {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        .matrix-row:hover .project-cell {
-            background-color: var(--tw-bg-opacity);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .bg-corp-gradient {
-            background: linear-gradient(135deg, #2e3a14 0%, #4a5720 100%);
-        }
-    </style>
+/* ── TOKENS ── */
+:root {
+  --bg-base:      #0C1507;
+  --bg-surface:   #152010;
+  --bg-card:      #1C2D14;
+  --bg-card-hover:#233618;
+  --border:       #2E4420;
+  --border-light: #3A5528;
+
+  --accent:       #A2C617;
+  --accent-dim:   rgba(162,198,23,0.12);
+  --accent-glow:  rgba(162,198,23,0.25);
+
+  --amber:        #E8A020;
+  --amber-dim:    rgba(232,160,32,0.14);
+  --blue:         #4aaee8;
+  --blue-dim:     rgba(74,174,232,0.14);
+  --coral:        #E86C50;
+  --coral-dim:    rgba(232,108,80,0.14);
+
+  --text-1:       #D8F0A0;
+  --text-2:       #8AAA60;
+  --text-3:       #4E6438;
+  --text-inv:     #0C1507;
+
+  --shadow-card:  0 2px 12px rgba(0,0,0,0.45);
+  --shadow-glow:  0 0 20px rgba(162,198,23,0.15);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+[data-theme="light"] {
+  --bg-base:      #F4F8E8;
+  --bg-surface:   #FFFFFF;
+  --bg-card:      #FFFFFF;
+  --bg-card-hover:#F0F6D8;
+  --border:       #D4E4A0;
+  --border-light: #C0D880;
+
+  --text-1:       #1A2A08;
+  --text-2:       #4A6030;
+  --text-3:       #8AAA60;
+  --text-inv:     #FFFFFF;
+
+  --shadow-card:  0 2px 12px rgba(0,0,0,0.10);
+  --shadow-glow:  0 0 20px rgba(162,198,23,0.12);
+}
+
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-1);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-mark svg { display: block; }
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logo-text .company {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.logo-text .product {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.period-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 99px;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-size: 16px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* ── SECTION LABEL ── */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+/* ── KPI ROW ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.kpi-card.accent::before { background: var(--accent); }
+.kpi-card.amber::before  { background: var(--amber); }
+.kpi-card.blue::before   { background: var(--blue); }
+.kpi-card.coral::before  { background: var(--coral); }
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+
+.kpi-value.accent { color: var(--accent); }
+.kpi-value.amber  { color: var(--amber); }
+.kpi-value.blue   { color: var(--blue); }
+.kpi-value.coral  { color: var(--coral); }
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.kpi-icon {
+  position: absolute;
+  top: 20px; right: 20px;
+  font-size: 28px;
+  opacity: 0.12;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-inv);
+}
+
+/* ── SECTION TITLE ── */
+.section-head {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  margin-bottom: 4px;
+  text-wrap: balance;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* ── PROJECT GRID ── */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 56px;
+}
+
+.project-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.project-card.selected {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-glow);
+}
+
+.project-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: var(--text-inv);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 22px;
+  text-align: center;
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.progress-ring-wrap {
+  flex-shrink: 0;
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.progress-ring-wrap svg {
+  transform: rotate(-90deg);
+}
+
+.ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+.ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+.ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-avance {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.status-pill.active  { background: var(--accent-dim);  color: var(--accent); }
+.status-pill.early   { background: var(--amber-dim);   color: var(--amber); }
+.status-pill.high    { background: var(--blue-dim);    color: var(--blue); }
+.status-pill.closing { background: var(--coral-dim);   color: var(--coral); }
+
+/* Sparkline */
+.sparkline-wrap {
+  height: 48px;
+  width: 100%;
+  position: relative;
+}
+
+.card-total {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.card-total-label {
+  font-size: 11px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.card-total-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── DETAIL SECTION ── */
+.detail-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 56px;
+}
+
+.detail-header {
+  padding: 28px 32px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+}
+
+.detail-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+
+.detail-subtitle {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.legend-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-dot.line {
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.detail-charts {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.chart-panel {
+  position: relative;
+}
+
+.chart-panel-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+
+.chart-wrap {
+  position: relative;
+  height: 220px;
+  width: 100%;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* ── COMPARISON TABLE ── */
+.table-section {
+  margin-bottom: 56px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+thead {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  padding: 12px 16px;
+  text-align: right;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+th:first-child { text-align: left; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+
+tbody tr:hover { background: var(--bg-card-hover); }
+
+td {
+  padding: 12px 16px;
+  text-align: right;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+td:first-child {
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-1);
+}
+
+.td-accent { color: var(--accent); font-weight: 700; }
+
+.progress-bar-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.mini-bar {
+  width: 60px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mini-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  font-size: 12px;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover { color: var(--accent); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .project-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .main { padding: 24px 16px 60px; }
+  .header-inner { padding: 0 16px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .project-grid { grid-template-columns: 1fr; }
+  .detail-charts { padding: 20px 16px; }
+  .kpi-value { font-size: 24px; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease both;
+}
+
+.fade-up:nth-child(1) { animation-delay: 0.05s; }
+.fade-up:nth-child(2) { animation-delay: 0.10s; }
+.fade-up:nth-child(3) { animation-delay: 0.15s; }
+.fade-up:nth-child(4) { animation-delay: 0.20s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, .fade-up { animation: none !important; transition: none !important; }
+}
+</style>
 </head>
-<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
-<!-- TopNavBar -->
-<header class="bg-verde-profundo bg-corp-gradient sticky top-0 z-50 border-b border-white/10 shadow-lg w-full">
-<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-[1920px] mx-auto">
-<div class="flex items-center gap-8">
-<span class="font-headline-lg text-headline-lg font-bold text-primary">Cuantificación de inventarios</span>
-<nav class="hidden md:flex gap-6">
-</nav>
-</div>
-</div>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-group">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="10" width="4" height="8" rx="1" fill="#0C1507"/>
+          <rect x="8" y="6" width="4" height="12" rx="1" fill="#0C1507"/>
+          <rect x="14" y="2" width="4" height="16" rx="1" fill="#0C1507"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="company">Ingeurbe</span>
+        <span class="product">Inventarios 2026</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="period-badge">Enero – Junio 2026</span>
+      <button class="theme-toggle" id="themeToggle" title="Cambiar tema">☀</button>
+    </div>
+  </div>
 </header>
-<div class="flex min-h-screen max-w-[1920px] mx-auto">
-<!-- SideNavBar -->
-<!-- Main Content Canvas -->
-<main class="flex-1 p-margin-desktop mx-auto w-full">
-<!-- Header Section -->
-<section class="mb-8">
-<h1 class="font-headline-lg text-verde-profundo mb-1">Cuantificación de Inventarios con respecto al Avance de Proyectos</h1>
-<p class="font-body-lg text-gris-corp">Periodo Analizado: Enero – Diciembre 2026</p>
-</section>
-<!-- KPI Row -->
 
-<!-- Filters Bar -->
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4 shadow-sm">
-<div class="flex-1 flex flex-wrap gap-3">
-<div class="relative">
-<select id="projectFilter" class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-sm focus:ring-2 focus:ring-primary outline-none cursor-pointer text-gris-corp">
-<option>Project: All Projects</option>
-<option>ALBURA</option>
-<option>CORTEZZA</option>
-<option>FLORA</option>
-<option>MADERO</option>
-<option>NATIVA</option>
-<option>PIAZZA</option>
-<option>RESERVA DEL LAGO</option>
-<option>TERRA</option>
-<option>VIALE</option>
-</select>
-<span class="material-symbols-outlined absolute right-3 top-2.5 text-gris-corp pointer-events-none">expand_more</span>
-</div>
-<div class="relative">
-<select id="yearFilter" class="appearance-none bg-surface-container-low border border-outline-variant rounded-lg px-4 py-2 pr-10 text-sm focus:ring-2 focus:ring-primary outline-none cursor-pointer text-gris-corp">
-<option>Año: All Years</option>
-<option selected>2026</option>
-<option>2025</option>
-<option>2024</option>
-<option>2023</option>
-</select>
-<span class="material-symbols-outlined absolute right-3 top-2.5 text-gris-corp pointer-events-none">expand_more</span>
-</div>
-</div>
-<button class="bg-surface-container-high border border-outline-variant px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-surface-container-highest transition-colors text-gris-corp font-bold text-sm">
-<span class="material-symbols-outlined text-[18px]">filter_alt</span>
-More Filters
-</button>
-<button class="bg-primary text-verde-profundo px-6 py-2 rounded-lg font-bold hover:brightness-95 shadow-sm">Apply View</button>
-</section>
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-12">
-<div id="charts-container"></div>
-</section>
+<!-- ── MAIN ── -->
+<main class="main">
 
-<!-- Legend -->
-<!-- Legend -->
-<div class="bg-surface-container-low px-margin-desktop py-4 border-t border-outline-variant flex items-center justify-between">
-<div class="flex items-center gap-8">
-<div class="flex items-center gap-2">
-<div class="w-4 h-3 bg-primary rounded-sm"></div>
-<span class="text-xs font-bold text-gris-corp">Mensual Inventory</span>
-</div>
-<div class="flex items-center gap-2">
-<div class="w-3 h-3 rounded-full border-2 border-verde-profundo"></div>
-<span class="text-xs font-bold text-gris-corp">Progress Milestone</span>
-</div>
-</div>
-</div>
-</section>
+  <!-- KPI ROW -->
+  <div class="kpi-grid" style="margin-bottom:48px">
+    <div class="kpi-card accent fade-up">
+      <div class="kpi-label">Valor Total Portfolio</div>
+      <div class="kpi-value accent" id="kpi-total">$0</div>
+      <div class="kpi-sub">Acumulado Ene–Jun 2026</div>
+      <div class="kpi-icon">💰</div>
+    </div>
+    <div class="kpi-card amber fade-up">
+      <div class="kpi-label">Proyectos Activos</div>
+      <div class="kpi-value amber" id="kpi-projects">0</div>
+      <div class="kpi-sub">Con inventario registrado</div>
+      <div class="kpi-icon">🏗</div>
+    </div>
+    <div class="kpi-card blue fade-up">
+      <div class="kpi-label">Avance Promedio</div>
+      <div class="kpi-value blue" id="kpi-avance">0%</div>
+      <div class="kpi-sub">Ponderado al periodo</div>
+      <div class="kpi-icon">📈</div>
+    </div>
+    <div class="kpi-card coral fade-up">
+      <div class="kpi-label">Mayor Inventario</div>
+      <div class="kpi-value coral" id="kpi-top">—</div>
+      <div class="kpi-sub" id="kpi-top-sub">Proyecto con más valor</div>
+      <div class="kpi-icon">🏆</div>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <span class="filter-label">Filtrar:</span>
+    <div class="chips" id="filterChips">
+      <button class="chip active" data-filter="all">Todos</button>
+    </div>
+  </div>
+
+  <!-- PROJECT GRID -->
+  <div class="section-head">
+    <div class="eyebrow">Proyectos</div>
+    <div class="section-title">Vista general por proyecto</div>
+    <div class="section-desc">Haga clic en una tarjeta para ver el detalle completo</div>
+  </div>
+
+  <div class="project-grid" id="projectGrid"></div>
+
+  <!-- DETAIL SECTION -->
+  <div class="section-head">
+    <div class="eyebrow">Detalle mensual</div>
+    <div class="section-title" id="detailTitle">Seleccione un proyecto</div>
+    <div class="section-desc" id="detailDesc">Haga clic en una tarjeta de proyecto para ver su evolución mensual</div>
+  </div>
+
+  <div class="detail-section" id="detailSection">
+    <div class="detail-header">
+      <div>
+        <div class="detail-title" id="detailProjectName">—</div>
+        <div class="detail-subtitle">Evolución mensual 2026</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--accent)"></div>
+          Inventario (miles M COP)
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:var(--amber)"></div>
+          Avance de obra (%)
+        </div>
+      </div>
+    </div>
+    <div class="detail-charts">
+      <div class="chart-panel">
+        <div class="chart-panel-label">Valor de inventario mensual (Miles de Millones COP)</div>
+        <div class="chart-wrap">
+          <canvas id="chartInventario"></canvas>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="chart-panel">
+        <div class="chart-panel-label">Avance de obra acumulado (%)</div>
+        <div class="chart-wrap">
+          <canvas id="chartAvance"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE -->
+  <div class="table-section">
+    <div class="section-head">
+      <div class="eyebrow">Comparativo</div>
+      <div class="section-title">Resumen por proyecto</div>
+      <div class="section-desc">Totales acumulados enero–junio 2026</div>
+    </div>
+    <div class="table-scroll">
+      <table id="summaryTable">
+        <thead>
+          <tr>
+            <th>Proyecto</th>
+            <th>Ene</th>
+            <th>Feb</th>
+            <th>Mar</th>
+            <th>Abr</th>
+            <th>May</th>
+            <th>Jun</th>
+            <th>Total Inv.</th>
+            <th>Avance Jun</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </main>
-</div>
-<!-- Footer -->
-<footer class="bg-surface-container-low border-t border-outline-variant py-8 px-margin-desktop mt-12">
-<div class="flex flex-col md:flex-row justify-between items-center w-full max-w-[1920px] mx-auto gap-4">
-<p class="text-sm text-gris-corp">© 2026 Ingeurbe Construction Analytics | Data Refreshed: 15m ago</p>
-<div class="flex gap-6">
-<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Privacy Policy</a>
-<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Terms of Service</a>
-<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">Inventory Methodology</a>
-<a class="text-gris-corp hover:text-verde-profundo text-xs hover:underline" href="#">API Status</a>
-</div>
-</div>
+
+<footer>
+  <div class="footer-copy">© 2026 Ingeurbe Construction Analytics · Datos al corte: Junio 2026</div>
+  <div class="footer-links">
+    <a href="#">Metodología</a>
+    <a href="#">Exportar</a>
+    <a href="#">Soporte</a>
+  </div>
 </footer>
+
 <script>
-// Datos de proyectos (extraídos del HTML)
-const proyectosData = {
-    'ALBURA': {
-        valores: [17778586.91, 284263503.71, 171403914.82, 1703290474.79, 578504192.34, 190747595.60, 0, 0, 0, 0, 0, 0],
-        avance: [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
-        icon: 'eco'
-    },
-    'CORTEZZA': {
-        valores: [819429427.80, 1404047788.45, 1997871769.53, 776782619.91, 0, 0, 0, 0, 0, 0, 0, 0],
-        avance: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        icon: 'grass'
-    },
-    'FLORA': {
-        valores: [546719219.55, 759935783.89, 1116054019.57, 1608772256.40, 2693103473.81, 2112129498.69, 0, 0, 0, 0, 0, 0],
-        avance: [16, 19, 23, 26, 29, 31, 0, 0, 0, 0, 0, 0],
-        icon: 'leaf'
-    },
-    'MADERO': {
-        valores: [884603626.59, 971831232.35, 950971227.49, 1020929910.30, 1101317599.28, 1109121866.09, 0, 0, 0, 0, 0, 0],
-        avance: [63, 68, 75, 82, 86, 91, 0, 0, 0, 0, 0, 0],
-        icon: 'lumber'
-    },
-    'NATIVA': {
-        valores: [914267589.60, 794126278.41, 907730254.92, 530185173.81, 2898619602.94, 1580434245.93, 0, 0, 0, 0, 0, 0],
-        avance: [3, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0],
-        icon: 'eco'
-    },
-    'PIAZZA': {
-        valores: [0, 0, 927256719.13, 33727591.92, 747562006.44, 157759974.20, 0, 0, 0, 0, 0, 0],
-        avance: [0, 0, 1, 2, 3, 3, 0, 0, 0, 0, 0, 0],
-        icon: 'location_city'
-    },
-    'RESERVA DEL LAGO': {
-        valores: [1252191558.22, 934167135.58, 877354449.23, 694278844.22, 671502088.17, 658004411.32, 0, 0, 0, 0, 0, 0],
-        avance: [74, 77, 79, 83, 89, 92, 0, 0, 0, 0, 0, 0],
-        icon: 'water'
-    },
-    'TERRA': {
-        valores: [764656363.49, 594015737.09, 630227491.99, 571539239.07, 613172030.81, 557607254.72, 0, 0, 0, 0, 0, 0],
-        avance: [60, 64, 70, 77, 82, 87, 0, 0, 0, 0, 0, 0],
-        icon: 'public'
-    },
-    'VIALE': {
-        valores: [414018561.81, 591217884.66, 1291749462.82, 940626714.36, 0, 0, 0, 0, 0, 0, 0, 0],
-        avance: [9, 12, 15, 20, 0, 0, 0, 0, 0, 0, 0, 0],
-        icon: 'directions'
-    }
+// ── DATA ──────────────────────────────────────────────────────────────
+const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTHS_ACTIVE = 6; // data disponible hasta junio
+
+const PROJECTS = {
+  'ALBURA': {
+    valores: [17778586.91,284263503.71,171403914.82,1703290474.79,578504192.34,190747595.60,0,0,0,0,0,0],
+    avance:  [0,0,0,0,0,2,0,0,0,0,0,0],
+    status: 'early'
+  },
+  'CORTEZZA': {
+    valores: [819429427.80,1404047788.45,1997871769.53,776782619.91,0,0,0,0,0,0,0,0],
+    avance:  [0,0,0,0,0,0,0,0,0,0,0,0],
+    status: 'early'
+  },
+  'FLORA': {
+    valores: [546719219.55,759935783.89,1116054019.57,1608772256.40,2693103473.81,2112129498.69,0,0,0,0,0,0],
+    avance:  [16,19,23,26,29,31,0,0,0,0,0,0],
+    status: 'active'
+  },
+  'MADERO': {
+    valores: [884603626.59,971831232.35,950971227.49,1020929910.30,1101317599.28,1109121866.09,0,0,0,0,0,0],
+    avance:  [63,68,75,82,86,91,0,0,0,0,0,0],
+    status: 'closing'
+  },
+  'NATIVA': {
+    valores: [914267589.60,794126278.41,907730254.92,530185173.81,2898619602.94,1580434245.93,0,0,0,0,0,0],
+    avance:  [3,3,4,5,6,7,0,0,0,0,0,0],
+    status: 'early'
+  },
+  'PIAZZA': {
+    valores: [0,0,927256719.13,33727591.92,747562006.44,157759974.20,0,0,0,0,0,0],
+    avance:  [0,0,1,2,3,3,0,0,0,0,0,0],
+    status: 'early'
+  },
+  'RESERVA DEL LAGO': {
+    valores: [1252191558.22,934167135.58,877354449.23,694278844.22,671502088.17,658004411.32,0,0,0,0,0,0],
+    avance:  [74,77,79,83,89,92,0,0,0,0,0,0],
+    status: 'closing'
+  },
+  'TERRA': {
+    valores: [764656363.49,594015737.09,630227491.99,571539239.07,613172030.81,557607254.72,0,0,0,0,0,0],
+    avance:  [60,64,70,77,82,87,0,0,0,0,0,0],
+    status: 'closing'
+  },
+  'VIALE': {
+    valores: [414018561.81,591217884.66,1291749462.82,940626714.36,0,0,0,0,0,0,0,0],
+    avance:  [9,12,15,20,0,0,0,0,0,0,0,0],
+    status: 'active'
+  }
 };
 
-const months = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+const STATUS_LABEL = {
+  active:  'En desarrollo',
+  early:   'Etapa inicial',
+  closing: 'Avanzado',
+  high:    'Alto volumen'
+};
 
-function createProjectChart(projectName, data) {
-    // Escalar valores a miles de millones (COP) para legibilidad
-    const scaleDivisor = 1000000000;
-    const monthlyValues = data.valores.map(v => v / scaleDivisor);
-
-    const container = document.getElementById('charts-container');
-    
-    // Crear sección para el proyecto
-    const section = document.createElement('div');
-    section.className = 'border-b border-outline-variant p-6 last:border-b-0';
-    section.dataset.project = projectName;
-    section.dataset.year = '2026';
-    
-    // Header del proyecto
-    const header = document.createElement('div');
-    header.className = 'flex items-center gap-3 mb-4';
-    header.innerHTML = `
-        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary">eco</span>
-        </div>
-        <div>
-            <p class="font-bold text-verde-profundo text-sm uppercase">${projectName}</p>
-            <p class="text-xs text-gris-corp">Año 2026</p>
-        </div>
-    `;
-    
-    // Contenedor con altura FIJA (crítico para Chart.js responsive)
-    const chartWrapper = document.createElement('div');
-    chartWrapper.style.position = 'relative';
-    chartWrapper.style.height = '220px';
-    chartWrapper.style.width = '100%';
-    
-    // Canvas para gráfico
-    const canvas = document.createElement('canvas');
-    canvas.id = `chart-${projectName}`;
-    chartWrapper.appendChild(canvas);
-    
-    section.appendChild(header);
-    section.appendChild(chartWrapper);
-    container.appendChild(section);
-    
-    // Crear gráfico
-    new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: 'Avance (%)',
-                    data: data.avance,
-                    backgroundColor: '#22c55e',
-                    borderRadius: 4,
-                    yAxisID: 'y',
-                    order: 2
-                },
-                {
-                    label: 'Valor (Miles de Millones COP)',
-                    data: monthlyValues,
-                    type: 'line',
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
-                    borderWidth: 3,
-                    fill: false,
-                    tension: 0.4,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#3b82f6',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    yAxisID: 'y1',
-                    order: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { padding: 15, font: { size: 11, weight: 'bold' } }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    callbacks: {
-                        afterLabel: function(context) {
-                            if (context.datasetIndex === 1) {
-                                const valor = data.valores[context.dataIndex];
-                                return `$ ${valor.toLocaleString('es-CO')}`;
-                            }
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    position: 'left',
-                    title: { display: true, text: 'Avance (%)', font: { weight: 'bold' } },
-                    max: 100,
-                    ticks: { callback: v => v + '%' }
-                },
-                y1: {
-                    position: 'right',
-                    title: { display: true, text: 'Miles de Millones COP', font: { weight: 'bold' } },
-                    grid: { drawOnChartArea: false },
-                    beginAtZero: true,
-                    ticks: {
-                        callback: v => v.toFixed(1) + 'B'
-                    }
-                }
-            }
-        }
-    });
+// ── HELPERS ───────────────────────────────────────────────────────────
+function totalValor(p) {
+  return PROJECTS[p].valores.slice(0,MONTHS_ACTIVE).reduce((a,b)=>a+b,0);
 }
 
-// Generar gráficos cuando cargue
-window.addEventListener('DOMContentLoaded', () => {
-    Object.keys(proyectosData).forEach(project => {
-        createProjectChart(project, proyectosData[project]);
-    });
-    applyFilters();
+function lastAvance(p) {
+  const av = PROJECTS[p].avance;
+  for(let i=MONTHS_ACTIVE-1;i>=0;i--){ if(av[i]>0) return av[i]; }
+  return 0;
+}
+
+function fmtBill(v) {
+  const b = v/1e9;
+  if(b>=1) return '$'+b.toFixed(2)+'B';
+  return '$'+(v/1e6).toFixed(0)+'M';
+}
+
+function fmtCOP(v) {
+  return '$'+v.toLocaleString('es-CO');
+}
+
+function animateCounter(el, from, to, duration, formatter) {
+  const start = performance.now();
+  function step(now) {
+    const t = Math.min((now-start)/duration, 1);
+    const ease = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+    el.textContent = formatter(from + (to-from)*ease);
+    if(t<1) requestAnimationFrame(step);
+    else el.textContent = formatter(to);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────
+const toggle = document.getElementById('themeToggle');
+let isDark = true;
+
+toggle.addEventListener('click', () => {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  toggle.textContent = isDark ? '☀' : '🌙';
+  if(selectedProject) renderDetailCharts(selectedProject);
+  renderSparklines();
 });
 
-// Filtros
-const projectFilter = document.getElementById('projectFilter');
-const yearFilter = document.getElementById('yearFilter');
+// ── KPIs ──────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const names = Object.keys(PROJECTS);
+  const total = names.reduce((s,p)=>s+totalValor(p),0);
+  const active = names.filter(p=>PROJECTS[p].valores.slice(0,MONTHS_ACTIVE).some(v=>v>0)).length;
+  const avances = names.map(p=>lastAvance(p)).filter(v=>v>0);
+  const avgAvance = avances.reduce((s,v)=>s+v,0) / avances.length;
+  const topProj = names.reduce((a,b)=>totalValor(a)>totalValor(b)?a:b);
 
-function applyFilters() {
-    const selectedProject = projectFilter.value;
-    const selectedYear = yearFilter.value;
-    const sections = document.querySelectorAll('#charts-container > div');
-    
-    sections.forEach(section => {
-        const projName = section.dataset.project;
-        const year = section.dataset.year;
-        
-        let show = true;
-        
-        if (selectedProject !== 'Project: All Projects' && projName !== selectedProject) {
-            show = false;
-        }
-        
-        if (show && selectedYear !== 'Año: All Years' && year !== selectedYear) {
-            show = false;
-        }
-        
-        section.style.display = show ? 'block' : 'none';
-    });
+  animateCounter(document.getElementById('kpi-total'), 0, total, 1200,
+    v => '$'+Math.round(v/1e9).toLocaleString('es-CO')+'B COP');
+  animateCounter(document.getElementById('kpi-projects'), 0, active, 800, v=>Math.round(v));
+  animateCounter(document.getElementById('kpi-avance'), 0, avgAvance, 1000,
+    v=>Math.round(v)+'%');
+  document.getElementById('kpi-top').textContent = topProj;
+  document.getElementById('kpi-top-sub').textContent = fmtBill(totalValor(topProj));
 }
 
-if (projectFilter) projectFilter.addEventListener('change', applyFilters);
-if (yearFilter) yearFilter.addEventListener('change', applyFilters);
+// ── FILTER CHIPS ──────────────────────────────────────────────────────
+let activeFilter = 'all';
+let selectedProject = null;
+
+function renderFilterChips() {
+  const chips = document.getElementById('filterChips');
+  const statuses = [...new Set(Object.values(PROJECTS).map(p=>p.status))];
+  statuses.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.dataset.filter = s;
+    btn.textContent = STATUS_LABEL[s] || s;
+    chips.appendChild(btn);
+  });
+  chips.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    activeFilter = chip.dataset.filter;
+    chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    renderProjectGrid();
+  });
+}
+
+// ── SPARKLINES ────────────────────────────────────────────────────────
+const sparklineCharts = {};
+
+function renderSparkline(canvas, valores) {
+  const existing = sparklineCharts[canvas.id];
+  if(existing) existing.destroy();
+
+  const data = valores.slice(0,MONTHS_ACTIVE).map(v=>v/1e9);
+  const style = getComputedStyle(document.documentElement);
+  const accent = style.getPropertyValue('--accent').trim();
+  const border = style.getPropertyValue('--border').trim();
+
+  sparklineCharts[canvas.id] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: MONTHS.slice(0,MONTHS_ACTIVE),
+      datasets: [{
+        data,
+        backgroundColor: accent,
+        borderRadius: 2,
+        barThickness: 'flex'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600 },
+      plugins: { legend:{display:false}, tooltip:{enabled:false} },
+      scales: {
+        x: { display:false },
+        y: { display:false, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderSparklines() {
+  Object.keys(PROJECTS).forEach(name => {
+    const canvas = document.getElementById('spark-'+name.replace(/\s/g,'_'));
+    if(canvas) renderSparkline(canvas, PROJECTS[name].valores);
+  });
+}
+
+// ── PROGRESS RING ─────────────────────────────────────────────────────
+function setRing(svgEl, pct) {
+  const r = 25;
+  const circ = 2*Math.PI*r;
+  const fill = svgEl.querySelector('.ring-fill');
+  fill.setAttribute('stroke-dasharray', circ);
+  fill.setAttribute('stroke-dashoffset', circ);
+  // Animate via requestAnimationFrame after next paint
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      fill.style.strokeDashoffset = circ*(1 - pct/100);
+    });
+  });
+}
+
+// ── PROJECT GRID ──────────────────────────────────────────────────────
+function renderProjectGrid() {
+  const grid = document.getElementById('projectGrid');
+  grid.innerHTML = '';
+
+  Object.keys(PROJECTS).forEach(name => {
+    const p = PROJECTS[name];
+    if(activeFilter !== 'all' && p.status !== activeFilter) return;
+
+    const av = lastAvance(name);
+    const total = totalValor(name);
+    const safeId = name.replace(/\s/g,'_');
+
+    const style = getComputedStyle(document.documentElement);
+    const accent = style.getPropertyValue('--accent').trim();
+    const amber  = style.getPropertyValue('--amber').trim();
+    const blue   = style.getPropertyValue('--blue').trim();
+    const coral  = style.getPropertyValue('--coral').trim();
+    const ringColor = p.status==='closing' ? coral : p.status==='active' ? blue : accent;
+
+    const card = document.createElement('div');
+    card.className = 'project-card' + (selectedProject===name?' selected':'');
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="progress-ring-wrap">
+          <svg width="60" height="60" viewBox="0 0 60 60">
+            <circle class="ring-bg" cx="30" cy="30" r="25"/>
+            <circle class="ring-fill" cx="30" cy="30" r="25"
+              stroke="${ringColor}"
+              stroke-dasharray="157"
+              stroke-dashoffset="157"
+              style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"/>
+          </svg>
+          <div class="ring-label">${av}%</div>
+        </div>
+        <div class="card-info">
+          <div class="card-name">${name}</div>
+          <div class="card-avance">Avance al cierre Jun</div>
+          <span class="status-pill ${p.status}">${STATUS_LABEL[p.status]}</span>
+        </div>
+      </div>
+      <div class="sparkline-wrap">
+        <canvas id="spark-${safeId}"></canvas>
+      </div>
+      <div class="card-total">
+        <span class="card-total-label">Inv. acumulado</span>
+        <span class="card-total-value">${fmtBill(total)}</span>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      selectedProject = name;
+      document.querySelectorAll('.project-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      renderDetailCharts(name);
+    });
+
+    grid.appendChild(card);
+
+    // Animate ring after DOM insertion
+    setTimeout(() => {
+      const svg = card.querySelector('svg');
+      setRing(svg, av);
+    }, 100);
+  });
+
+  // Render sparklines after all cards created
+  setTimeout(renderSparklines, 50);
+}
+
+// ── DETAIL CHARTS ─────────────────────────────────────────────────────
+let chartInv = null;
+let chartAvance = null;
+
+function getChartColors() {
+  const style = getComputedStyle(document.documentElement);
+  return {
+    accent:  style.getPropertyValue('--accent').trim(),
+    amber:   style.getPropertyValue('--amber').trim(),
+    blue:    style.getPropertyValue('--blue').trim(),
+    text2:   style.getPropertyValue('--text-2').trim(),
+    text3:   style.getPropertyValue('--text-3').trim(),
+    border:  style.getPropertyValue('--border').trim(),
+    bgCard:  style.getPropertyValue('--bg-card').trim(),
+  };
+}
+
+function renderDetailCharts(name) {
+  document.getElementById('detailTitle').textContent = name;
+  document.getElementById('detailProjectName').textContent = name;
+  document.getElementById('detailDesc').textContent =
+    `Evolución mensual del inventario y avance de obra — Proyecto ${name}`;
+
+  const p = PROJECTS[name];
+  const labels = MONTHS.slice(0,MONTHS_ACTIVE);
+  const valores = p.valores.slice(0,MONTHS_ACTIVE).map(v=>v/1e9);
+  const avances = p.avance.slice(0,MONTHS_ACTIVE);
+  const c = getChartColors();
+
+  const commonScaleOpts = {
+    grid:  { color: c.border, lineWidth: 1 },
+    ticks: { color: c.text2, font:{size:11,weight:'600'} }
+  };
+
+  const commonPlugins = {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: '#0C1507',
+      borderColor: c.border,
+      borderWidth: 1,
+      titleColor: c.accent,
+      bodyColor: c.text2,
+      padding: 10,
+      callbacks: {}
+    }
+  };
+
+  // Inventario chart
+  if(chartInv) chartInv.destroy();
+  const ctxInv = document.getElementById('chartInventario').getContext('2d');
+
+  const gradInv = ctxInv.createLinearGradient(0,0,0,220);
+  gradInv.addColorStop(0, c.accent+'55');
+  gradInv.addColorStop(1, c.accent+'08');
+
+  chartInv = new Chart(ctxInv, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: valores,
+        backgroundColor: valores.map((v,i)=> i===valores.length-1 ? c.accent : c.accent+'AA'),
+        borderRadius: { topLeft:4, topRight:4 },
+        borderSkipped: 'bottom',
+        barThickness: 'flex',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      plugins: {
+        ...commonPlugins,
+        tooltip: {
+          ...commonPlugins.tooltip,
+          callbacks: {
+            label: ctx => {
+              const raw = p.valores[ctx.dataIndex];
+              return ` ${fmtCOP(raw)}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ...commonScaleOpts, grid:{display:false} },
+        y: {
+          ...commonScaleOpts,
+          beginAtZero: true,
+          ticks: {
+            ...commonScaleOpts.ticks,
+            callback: v => v.toFixed(1)+'B'
+          }
+        }
+      }
+    }
+  });
+
+  // Avance chart
+  if(chartAvance) chartAvance.destroy();
+  const ctxAv = document.getElementById('chartAvance').getContext('2d');
+
+  const gradAv = ctxAv.createLinearGradient(0,0,0,220);
+  gradAv.addColorStop(0, c.amber+'40');
+  gradAv.addColorStop(1, c.amber+'05');
+
+  chartAvance = new Chart(ctxAv, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: avances,
+        borderColor: c.amber,
+        backgroundColor: gradAv,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: c.amber,
+        pointBorderColor: '#0C1507',
+        pointBorderWidth: 2,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      plugins: {
+        ...commonPlugins,
+        tooltip: {
+          ...commonPlugins.tooltip,
+          callbacks: {
+            label: ctx => ` ${ctx.parsed.y}% de avance`
+          }
+        }
+      },
+      scales: {
+        x: { ...commonScaleOpts, grid:{display:false} },
+        y: {
+          ...commonScaleOpts,
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            ...commonScaleOpts.ticks,
+            callback: v => v+'%'
+          }
+        }
+      }
+    }
+  });
+}
+
+// ── SUMMARY TABLE ─────────────────────────────────────────────────────
+function renderTable() {
+  const body = document.getElementById('tableBody');
+  const names = Object.keys(PROJECTS);
+
+  // Sort by total desc
+  names.sort((a,b)=>totalValor(b)-totalValor(a));
+
+  names.forEach(name => {
+    const p = PROJECTS[name];
+    const vals = p.valores.slice(0,MONTHS_ACTIVE);
+    const total = vals.reduce((a,b)=>a+b,0);
+    const av = lastAvance(name);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${name}</td>
+      ${vals.map(v=>v>0?`<td>${fmtBill(v)}</td>`:`<td style="color:var(--text-3)">—</td>`).join('')}
+      <td class="td-accent">${fmtBill(total)}</td>
+      <td>
+        <div class="progress-bar-cell">
+          <div class="mini-bar">
+            <div class="mini-bar-fill" style="width:${av}%"></div>
+          </div>
+          ${av}%
+        </div>
+      </td>
+    `;
+    tr.style.cursor = 'pointer';
+    tr.addEventListener('click', () => {
+      selectedProject = name;
+      document.querySelectorAll('.project-card').forEach(c=>c.classList.remove('selected'));
+      const card = [...document.querySelectorAll('.project-card')]
+        .find(c=>c.querySelector('.card-name')?.textContent===name);
+      if(card) {
+        card.classList.add('selected');
+        card.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+      renderDetailCharts(name);
+    });
+    body.appendChild(tr);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  renderKPIs();
+  renderFilterChips();
+  renderProjectGrid();
+  renderTable();
+
+  // Auto-select first project
+  const first = Object.keys(PROJECTS)[0];
+  selectedProject = first;
+  setTimeout(()=>{
+    const cards = document.querySelectorAll('.project-card');
+    if(cards[0]) cards[0].classList.add('selected');
+    renderDetailCharts(first);
+  }, 200);
+});
 </script>
-</body></html>
+</body>
+</html>
