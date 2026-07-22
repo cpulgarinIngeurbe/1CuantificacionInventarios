@@ -6,6 +6,7 @@ import {
   LineController, LineElement, PointElement,
   Title, Tooltip, Legend, Filler,
 } from 'chart.js'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { Chart } from 'react-chartjs-2'
 import styles from './InventoryChart.module.css'
 
@@ -13,7 +14,8 @@ ChartJS.register(
   CategoryScale, LinearScale,
   BarController, BarElement,
   LineController, LineElement, PointElement,
-  Title, Tooltip, Legend, Filler
+  Title, Tooltip, Legend, Filler,
+  ChartDataLabels
 )
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
@@ -116,6 +118,23 @@ export default function InventoryChart({ rows }) {
             return `  ${ctx.dataset.label}: ${fmtCOP(v)} COP`
           },
         },
+      },
+      datalabels: {
+        display(ctx) {
+          // Solo mostrar en la línea de Inventario Final (índice 2)
+          return ctx.datasetIndex === 2
+        },
+        formatter(value) {
+          return fmtCOP(value)
+        },
+        color: '#e94560',
+        font: { size: 11, weight: '600', family: 'Inter' },
+        anchor: 'end',
+        align: 'top',
+        offset: 4,
+        padding: { top: 2, bottom: 2, left: 4, right: 4 },
+        backgroundColor: 'rgba(13,17,23,0.7)',
+        borderRadius: 4,
       },
     },
     scales: {
