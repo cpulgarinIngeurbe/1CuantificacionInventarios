@@ -34,6 +34,7 @@
 
 .tag { color: #8b949e; font-weight: 500; }
 .divider { margin: 0 6px; color: #30363d; }
+.loadingDot { color: #8b949e; font-style: italic; }
 
 .right {
   display: flex;
