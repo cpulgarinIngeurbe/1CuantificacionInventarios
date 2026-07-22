@@ -1,13 +1,20 @@
 import React, { useMemo } from 'react'
 import {
   Chart as ChartJS,
-  CategoryScale, LinearScale, BarElement, PointElement,
-  LineElement, Title, Tooltip, Legend, Filler,
+  CategoryScale, LinearScale,
+  BarController, BarElement,
+  LineController, LineElement, PointElement,
+  Title, Tooltip, Legend, Filler,
 } from 'chart.js'
 import { Chart } from 'react-chartjs-2'
 import styles from './InventoryChart.module.css'
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(
+  CategoryScale, LinearScale,
+  BarController, BarElement,
+  LineController, LineElement, PointElement,
+  Title, Tooltip, Legend, Filler
+)
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
