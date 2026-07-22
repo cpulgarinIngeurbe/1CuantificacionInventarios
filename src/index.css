@@ -5,16 +5,14 @@
 }
 
 :root {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --surface2: #21262d;
-  --border: #30363d;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --accent: #e94560;
-  --accent2: #0f9461;
-  --blue: #4472c4;
-  --orange: #ed7d31;
+  --bg:           #111a0a;
+  --surface:      #16230e;
+  --surface2:     #1e2f14;
+  --border:       #344d22;
+  --text-primary: #e0ecc8;
+  --text-secondary: #8fa870;
+  --accent:       #8dc63f;
+  --accent2:      #c8e678;
   font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
