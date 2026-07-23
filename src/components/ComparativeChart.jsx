@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale,
@@ -63,14 +63,18 @@ export default function ComparativeChart({ data, year }) {
     return { projects, projectDataByMonth }
   }, [data, year])
 
-  const [selectedProjects, setSelectedProjects] = useState(
-    processedData.projects.reduce((acc, proj) => {
-      acc[proj] = true
-      return acc
-    }, {})
-  )
-
   const { projects, projectDataByMonth } = processedData
+  const [selectedProjects, setSelectedProjects] = useState({})
+
+  // Sincronizar selectedProjects cuando cambien los proyectos
+  useEffect(() => {
+    setSelectedProjects(
+      projects.reduce((acc, proj) => {
+        acc[proj] = true
+        return acc
+      }, {})
+    )
+  }, [projects])
 
   if (data.length === 0) return null
 
@@ -89,7 +93,7 @@ export default function ComparativeChart({ data, year }) {
     datasets: activeProjects.map((proj, idx) => ({
       type: 'line',
       label: proj,
-      data: projectDataByMonth[proj],
+      data: projectDataByMonth[proj].map(d => d ? d.inv : null),
       borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
       backgroundColor: 'transparent',
       borderWidth: 2.5,
