@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { useExcelData } from './hooks/useExcelData'
 import Header from './components/Header'
 import InventoryChart from './components/InventoryChart'
+import ComparativeChart from './components/ComparativeChart'
 import styles from './App.module.css'
 
 export default function App() {
@@ -50,6 +51,7 @@ export default function App() {
           </div>
         )}
         <InventoryChart rows={filteredRows} loading={loading} />
+        <ComparativeChart data={data} />
       </main>
     </div>
   )

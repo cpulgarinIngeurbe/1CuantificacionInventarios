@@ -1,0 +1,31 @@
+.container {
+  margin-top: 32px;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 24px;
+}
+
+.chartCard {
+  background: #ffffff;
+  border: 1px solid #e8e4df;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+.chartTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #2d5a3d;
+  margin-bottom: 18px;
+}
+
+.chartWrap {
+  position: relative;
+  height: 350px;
+}
