@@ -139,23 +139,54 @@ export default function InventoryChart({ rows }) {
       },
       datalabels: {
         display(ctx) {
-          // Mostrar etiquetas en línea de Inventario (idx 2) y Avance (idx 3)
-          return ctx.datasetIndex === 2 || ctx.datasetIndex === 3
+          // Mostrar etiquetas en barras (0, 1) y líneas (2, 3)
+          return true
         },
         formatter(value, ctx) {
+          if (value === 0 || value === null || value === undefined) return ''
           if (ctx.datasetIndex === 3) return value.toFixed(1) + '%'
+          if (ctx.datasetIndex === 0 || ctx.datasetIndex === 1) {
+            return fmtFull(Math.abs(value))
+          }
           return '$ ' + fmtFull(value)
         },
         color(ctx) {
+          if (ctx.datasetIndex === 0) return '#ffffff'
+          if (ctx.datasetIndex === 1) return '#ffffff'
           return ctx.datasetIndex === 3 ? C.avanceLine : C.invLine
         },
-        font: { size: 10, weight: '700', family: 'Inter' },
-        anchor: 'end',
-        align: 'top',
-        offset: 4,
-        padding: { top: 2, bottom: 2, left: 5, right: 5 },
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        borderRadius: 4,
+        font(ctx) {
+          if (ctx.datasetIndex === 0 || ctx.datasetIndex === 1) {
+            return { size: 8, weight: '600', family: 'Inter' }
+          }
+          return { size: 10, weight: '700', family: 'Inter' }
+        },
+        anchor(ctx) {
+          if (ctx.datasetIndex === 0) return 'end'
+          if (ctx.datasetIndex === 1) return 'start'
+          return 'end'
+        },
+        align(ctx) {
+          if (ctx.datasetIndex === 0) return 'top'
+          if (ctx.datasetIndex === 1) return 'bottom'
+          return 'top'
+        },
+        offset(ctx) {
+          if (ctx.datasetIndex === 0 || ctx.datasetIndex === 1) return 2
+          return 4
+        },
+        padding(ctx) {
+          if (ctx.datasetIndex === 0 || ctx.datasetIndex === 1) {
+            return { top: 1, bottom: 1, left: 3, right: 3 }
+          }
+          return { top: 2, bottom: 2, left: 5, right: 5 }
+        },
+        backgroundColor(ctx) {
+          if (ctx.datasetIndex === 0) return 'rgba(59,89,152,0.8)'
+          if (ctx.datasetIndex === 1) return 'rgba(230,126,34,0.8)'
+          return 'rgba(255,255,255,0.9)'
+        },
+        borderRadius: 3,
       },
     },
     scales: {
