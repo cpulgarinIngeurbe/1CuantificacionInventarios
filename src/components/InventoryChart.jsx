@@ -35,16 +35,16 @@ function fmtAxis(v) {
   return v.toFixed(0)
 }
 
-// Paleta verde
+// Paleta de colores
 const C = {
-  entradas:   'rgba(74,148,74,0.82)',     // verde medio
-  salidas:    'rgba(34,85,55,0.85)',       // verde oscuro
-  invLine:    '#8DC63F',                   // verde lima brillante
-  avanceLine: '#C8E678',                   // verde lima claro
-  grid:       'rgba(52,77,34,0.5)',
-  tick:       '#8FA870',
-  tickPct:    '#C8E678',
-  bg:         'rgba(22,35,14,0.85)',
+  entradas:   'rgba(59,89,152,0.85)',     // azul
+  salidas:    'rgba(230,126,34,0.85)',     // naranja
+  invLine:    '#c0392b',                   // rojo/maroon
+  avanceLine: '#5c7d5f',                   // verde oscuro
+  grid:       'rgba(200,200,200,0.3)',
+  tick:       '#7a7269',
+  tickPct:    '#5c7d5f',
+  bg:         'rgba(255,255,255,0.95)',
 }
 
 export default function InventoryChart({ rows }) {
@@ -89,7 +89,7 @@ export default function InventoryChart({ rows }) {
         borderWidth: 2.5,
         pointRadius: 5,
         pointBackgroundColor: C.invLine,
-        pointBorderColor: '#16230e',
+        pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         tension: 0.35,
         yAxisID: 'yCOP',
@@ -104,7 +104,7 @@ export default function InventoryChart({ rows }) {
         borderWidth: 2.5,
         pointRadius: 5,
         pointBackgroundColor: C.avanceLine,
-        pointBorderColor: '#16230e',
+        pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         tension: 0.35,
         yAxisID: 'yPct',
@@ -121,10 +121,10 @@ export default function InventoryChart({ rows }) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(16,26,10,0.96)',
-        titleColor: '#e0ecc8',
-        bodyColor: '#8FA870',
-        borderColor: '#344d22',
+        backgroundColor: 'rgba(44,38,32,0.96)',
+        titleColor: '#ffffff',
+        bodyColor: '#b8b0a8',
+        borderColor: '#e8e4df',
         borderWidth: 1,
         padding: 14,
         titleFont: { size: 13, weight: '600' },
@@ -154,14 +154,14 @@ export default function InventoryChart({ rows }) {
         align: 'top',
         offset: 4,
         padding: { top: 2, bottom: 2, left: 5, right: 5 },
-        backgroundColor: 'rgba(16,26,10,0.75)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
         borderRadius: 4,
       },
     },
     scales: {
       x: {
         grid: { display: false },
-        border: { color: '#344d22' },
+        border: { color: '#e8e4df' },
         ticks: { color: C.tick, font: { size: 11, family: 'Inter' } },
       },
       yCOP: {

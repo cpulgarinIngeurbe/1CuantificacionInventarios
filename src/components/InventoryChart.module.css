@@ -1,9 +1,9 @@
 .card {
-  background: #16230e;
-  border: 1px solid #344d22;
+  background: #ffffff;
+  border: 1px solid #e8e4df;
   border-radius: 16px;
   padding: 24px 28px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 }
 
 .cardHeader {
@@ -18,7 +18,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #8dc63f;
+  color: #5c7d5f;
 }
 
 .rightLabel {
@@ -26,7 +26,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #c8e678;
+  color: #5c7d5f;
 }
 
 .chartWrap {
@@ -41,7 +41,7 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  color: #8fa870;
+  color: #a89f97;
   font-size: 0.88rem;
 }
 
@@ -51,7 +51,7 @@
   gap: 16px;
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #1e2f14;
+  border-top: 1px solid #f0ebe4;
 }
 
 .legendItem {
@@ -59,7 +59,7 @@
   align-items: center;
   gap: 7px;
   font-size: 0.74rem;
-  color: #8fa870;
+  color: #7a7269;
 }
 
 .legendBox {
