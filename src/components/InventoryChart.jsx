@@ -35,15 +35,15 @@ function fmtAxis(v) {
   return v.toFixed(0)
 }
 
-// Paleta de colores
+// Paleta de colores pastel con énfasis verde corporativo
 const C = {
-  entradas:   'rgba(59,89,152,0.85)',     // azul
-  salidas:    'rgba(230,126,34,0.85)',     // naranja
-  invLine:    '#c0392b',                   // rojo/maroon
-  avanceLine: '#5c7d5f',                   // verde oscuro
+  entradas:   'rgba(143,188,226,0.85)',   // azul pastel
+  salidas:    'rgba(240,166,106,0.85)',   // naranja pastel
+  invLine:    '#d99999',                  // rojo pastel
+  avanceLine: '#7ab366',                  // verde pastel
   grid:       'rgba(200,200,200,0.3)',
   tick:       '#7a7269',
-  tickPct:    '#5c7d5f',
+  tickPct:    '#5c9966',
   bg:         'rgba(255,255,255,0.95)',
 }
 
