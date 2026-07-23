@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale,
@@ -18,11 +18,6 @@ ChartJS.register(
 
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
-function fmtFull(v) {
-  if (v === 0 || v === null || v === undefined) return '0'
-  return Math.round(Math.abs(v)).toLocaleString('es-CO')
-}
-
 function fmtAxis(v) {
   const abs = Math.abs(v)
   if (abs >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' B'
@@ -31,7 +26,6 @@ function fmtAxis(v) {
   return v.toFixed(0)
 }
 
-// Colores pastel para proyectos
 const PROJECT_COLORS = {
   FLORA:   '#e08080',
   TERRA:   '#7ab366',
@@ -47,41 +41,55 @@ const DEFAULT_COLORS = [
 
 export default function ComparativeChart({ data, year }) {
   const processedData = useMemo(() => {
-    // Filtrar datos por año seleccionado
     const filteredData = year ? data.filter(d => d.year === Number(year)) : data
     const projects = [...new Set(filteredData.map(d => d.proyecto))].sort()
 
     const projectDataByMonth = {}
     projects.forEach(proj => {
-      projectDataByMonth[proj] = {}
-      MONTHS.forEach((_, idx) => {
-        projectDataByMonth[proj][idx] = { inv: 0, avance: 0 }
-      })
+      projectDataByMonth[proj] = Array(12).fill(null)
     })
 
     filteredData.forEach(row => {
       const proj = row.proyecto
       const month = row.month
-      if (projectDataByMonth[proj] && projectDataByMonth[proj][month] !== undefined) {
-        projectDataByMonth[proj][month].inv = row.inventarioFinal || 0
-        projectDataByMonth[proj][month].avance = row.avanceObra || 0
+      if (projectDataByMonth[proj] && month >= 0 && month < 12) {
+        projectDataByMonth[proj][month] = {
+          inv: row.inventarioFinal || 0,
+          avance: row.avanceObra || 0,
+        }
       }
     })
 
     return { projects, projectDataByMonth }
   }, [data, year])
 
+  const [selectedProjects, setSelectedProjects] = useState(
+    processedData.projects.reduce((acc, proj) => {
+      acc[proj] = true
+      return acc
+    }, {})
+  )
+
   const { projects, projectDataByMonth } = processedData
 
   if (data.length === 0) return null
 
+  const toggleProject = (proj) => {
+    setSelectedProjects(prev => ({
+      ...prev,
+      [proj]: !prev[proj]
+    }))
+  }
+
+  const activeProjects = projects.filter(p => selectedProjects[p])
+
   // Gráfico de Inventario
   const inventoryChartData = {
     labels: MONTHS,
-    datasets: projects.map((proj, idx) => ({
+    datasets: activeProjects.map((proj, idx) => ({
       type: 'line',
       label: proj,
-      data: MONTHS.map((_, month) => projectDataByMonth[proj][month].inv),
+      data: projectDataByMonth[proj],
       borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
       backgroundColor: 'transparent',
       borderWidth: 2.5,
@@ -90,16 +98,17 @@ export default function ComparativeChart({ data, year }) {
       pointBorderColor: '#ffffff',
       pointBorderWidth: 2,
       tension: 0.35,
+      spanGaps: false,
     })),
   }
 
   // Gráfico de Avance
   const advanceChartData = {
     labels: MONTHS,
-    datasets: projects.map((proj, idx) => ({
+    datasets: activeProjects.map((proj, idx) => ({
       type: 'line',
       label: proj,
-      data: MONTHS.map((_, month) => projectDataByMonth[proj][month].avance),
+      data: projectDataByMonth[proj].map(d => d ? d.avance : null),
       borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
       backgroundColor: 'transparent',
       borderWidth: 2.5,
@@ -108,6 +117,7 @@ export default function ComparativeChart({ data, year }) {
       pointBorderColor: '#ffffff',
       pointBorderWidth: 2,
       tension: 0.35,
+      spanGaps: false,
     })),
   }
 
@@ -117,7 +127,7 @@ export default function ComparativeChart({ data, year }) {
     interaction: { mode: 'index', intersect: false },
     layout: { padding: { top: 20 } },
     plugins: {
-      legend: { display: true, position: 'top' },
+      legend: { display: false },
       tooltip: {
         backgroundColor: 'rgba(44,38,32,0.96)',
         titleColor: '#ffffff',
@@ -180,6 +190,27 @@ export default function ComparativeChart({ data, year }) {
 
   return (
     <div className={styles.container}>
+      <div className={styles.filterSection}>
+        <label className={styles.filterTitle}>Seleccionar Proyectos</label>
+        <div className={styles.filterGrid}>
+          {projects.map(proj => (
+            <label key={proj} className={styles.filterItem}>
+              <input
+                type="checkbox"
+                checked={selectedProjects[proj]}
+                onChange={() => toggleProject(proj)}
+                className={styles.checkbox}
+              />
+              <span className={styles.filterLabel}>{proj}</span>
+              <span
+                className={styles.colorDot}
+                style={{ backgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[projects.indexOf(proj) % DEFAULT_COLORS.length] }}
+              />
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className={styles.chartsGrid}>
         <div className={styles.chartCard}>
           <h3 className={styles.chartTitle}>Inventario al cierre del mes (COP)</h3>
