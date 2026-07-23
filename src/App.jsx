@@ -51,7 +51,7 @@ export default function App() {
           </div>
         )}
         <InventoryChart rows={filteredRows} loading={loading} />
-        <ComparativeChart data={data} />
+        <ComparativeChart data={data} year={year} />
       </main>
     </div>
   )

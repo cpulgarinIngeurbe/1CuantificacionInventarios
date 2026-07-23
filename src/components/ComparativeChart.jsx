@@ -45,9 +45,11 @@ const DEFAULT_COLORS = [
   '#f0a66a', '#6fb3d9', '#b8b8b8', '#d9a680', '#80d9b8',
 ]
 
-export default function ComparativeChart({ data }) {
+export default function ComparativeChart({ data, year }) {
   const processedData = useMemo(() => {
-    const projects = [...new Set(data.map(d => d.proyecto))].sort()
+    // Filtrar datos por año seleccionado
+    const filteredData = year ? data.filter(d => d.year === Number(year)) : data
+    const projects = [...new Set(filteredData.map(d => d.proyecto))].sort()
 
     const projectDataByMonth = {}
     projects.forEach(proj => {
@@ -57,17 +59,17 @@ export default function ComparativeChart({ data }) {
       })
     })
 
-    data.forEach(row => {
+    filteredData.forEach(row => {
       const proj = row.proyecto
       const month = row.month
-      if (projectDataByMonth[proj] && projectDataByMonth[proj][month]) {
-        projectDataByMonth[proj][month].inv = row.inventarioFinal
-        projectDataByMonth[proj][month].avance = row.avanceObra
+      if (projectDataByMonth[proj] && projectDataByMonth[proj][month] !== undefined) {
+        projectDataByMonth[proj][month].inv = row.inventarioFinal || 0
+        projectDataByMonth[proj][month].avance = row.avanceObra || 0
       }
     })
 
     return { projects, projectDataByMonth }
-  }, [data])
+  }, [data, year])
 
   const { projects, projectDataByMonth } = processedData
 
