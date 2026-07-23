@@ -14,7 +14,10 @@ export default function App() {
   const [year, setYear]       = useState('')
 
   React.useEffect(() => {
-    if (projects.length) setProject(projects[0])
+    if (projects.length) {
+      const nativaExists = projects.includes('NATIVA')
+      setProject(nativaExists ? 'NATIVA' : projects[0])
+    }
   }, [projects])
 
   React.useEffect(() => {
