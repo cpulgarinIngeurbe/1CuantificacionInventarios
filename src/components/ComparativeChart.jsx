@@ -161,8 +161,8 @@ export default function ComparativeChart({ data, year }) {
         },
         font: { size: 7, weight: '600', family: 'Inter' },
         anchor: 'center',
-        align: 'right',
-        offset: 3,
+        align: 'left',
+        offset: 10,
         backgroundColor(ctx) {
           return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
         },
