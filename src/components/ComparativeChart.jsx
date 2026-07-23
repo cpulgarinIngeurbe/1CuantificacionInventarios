@@ -85,7 +85,18 @@ export default function ComparativeChart({ data, year }) {
     }))
   }
 
+  const toggleAll = () => {
+    const allSelected = projects.every(p => selectedProjects[p])
+    setSelectedProjects(
+      projects.reduce((acc, proj) => {
+        acc[proj] = !allSelected
+        return acc
+      }, {})
+    )
+  }
+
   const activeProjects = projects.filter(p => selectedProjects[p])
+  const allSelected = projects.every(p => selectedProjects[p])
 
   // Gráfico de Inventario
   const inventoryChartData = {
@@ -221,7 +232,12 @@ export default function ComparativeChart({ data, year }) {
   return (
     <div className={styles.container}>
       <div className={styles.filterSection}>
-        <label className={styles.filterTitle}>Seleccionar Proyectos</label>
+        <div className={styles.filterHeader}>
+          <label className={styles.filterTitle}>Seleccionar Proyectos</label>
+          <button className={styles.toggleAllBtn} onClick={toggleAll}>
+            {allSelected ? 'Desseleccionar todo' : 'Seleccionar todo'}
+          </button>
+        </div>
         <div className={styles.filterGrid}>
           {projects.map(proj => (
             <label key={proj} className={styles.filterItem}>
