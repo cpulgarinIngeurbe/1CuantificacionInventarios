@@ -4,6 +4,7 @@ import styles from './Header.module.css'
 export default function Header({ projects, years, project, year, onProjectChange, onYearChange, loading }) {
   return (
     <header className={styles.header}>
+      <img src="/1CuantificacionInventarios/logo.png" alt="Ingeurbe" className={styles.logo} />
       <div className={styles.left}>
         <h1 className={styles.title}>Control de Inventarios y Avance de Obra</h1>
         <p className={styles.subtitle}>
