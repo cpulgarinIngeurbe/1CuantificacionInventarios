@@ -144,22 +144,30 @@ export default function ComparativeChart({ data, year }) {
       },
       datalabels: {
         display(ctx) {
-          return ctx.dataIndex === MONTHS.length - 1
+          // Encontrar el último punto con datos válidos
+          const data = ctx.dataset.data
+          for (let i = data.length - 1; i >= 0; i--) {
+            if (data[i] !== null && data[i] !== undefined) {
+              return ctx.dataIndex === i
+            }
+          }
+          return false
         },
         formatter(value, ctx) {
-          if (value === null || value === undefined) return ''
           return ctx.dataset.label
         },
         color(ctx) {
+          return '#ffffff'
+        },
+        font: { size: 10, weight: '700', family: 'Inter' },
+        anchor: 'end',
+        align: 'center',
+        offset: 8,
+        backgroundColor(ctx) {
           return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
         },
-        font: { size: 9, weight: '600', family: 'Inter' },
-        anchor: 'end',
-        align: 'right',
-        offset: 6,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        borderRadius: 3,
-        padding: { top: 2, bottom: 2, left: 4, right: 4 },
+        borderRadius: 4,
+        padding: { top: 3, bottom: 3, left: 6, right: 6 },
       },
     },
     scales: {
