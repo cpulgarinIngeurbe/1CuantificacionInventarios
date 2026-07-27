@@ -166,19 +166,8 @@ export default function ComparativeChart({ data, year }) {
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'nearest', intersect: true },
+      interaction: { mode: 'index', intersect: false },
       layout: { padding: { top: 20 } },
-      onClick: (event, elements, chart) => {
-        if (elements.length > 0) {
-          const element = elements[0]
-          const datasetIndex = element.datasetIndex
-          const dataset = chart.data.datasets[datasetIndex]
-          if (dataset && dataset.label) {
-            const datasetId = `${chartType}-${dataset.label}`
-            toggleDataset(datasetId)
-          }
-        }
-      },
       plugins: {
         legend: {
           display: true,
@@ -189,10 +178,14 @@ export default function ComparativeChart({ data, year }) {
             padding: 15,
             usePointStyle: true,
             pointStyle: 'circle',
+            cursor: 'pointer',
           },
-          onClick: (e, legendItem) => {
-            const datasetId = `${chartType}-${legendItem.text}`
+          onClick: (e, legendItem, legend) => {
+            e.stopPropagation()
+            const projectName = legendItem.text
+            const datasetId = `${chartType}-${projectName}`
             toggleDataset(datasetId)
+            return false
           },
         },
         tooltip: {
