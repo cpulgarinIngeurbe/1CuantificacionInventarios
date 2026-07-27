@@ -169,7 +169,7 @@ export default function ComparativeChart({ data, year }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20 } },
+      layout: { padding: { top: 20, right: 120 } },
       plugins: {
         legend: {
           display: false,
