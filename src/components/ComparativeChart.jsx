@@ -65,6 +65,7 @@ export default function ComparativeChart({ data, year }) {
 
   const { projects, projectDataByMonth } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})
+  const [visibleDatasets, setVisibleDatasets] = useState({})
 
   // Sincronizar selectedProjects cuando cambien los proyectos
   useEffect(() => {
@@ -75,6 +76,18 @@ export default function ComparativeChart({ data, year }) {
       }, {})
     )
   }, [projects])
+
+  // Inicializar visibleDatasets cuando cambien los proyectos activos
+  useEffect(() => {
+    const activeProjects = projects.filter(p => selectedProjects[p])
+    setVisibleDatasets(
+      activeProjects.reduce((acc, proj) => {
+        acc[`inventory-${proj}`] = true
+        acc[`advance-${proj}`] = true
+        return acc
+      }, {})
+    )
+  }, [selectedProjects, projects])
 
   if (data.length === 0) return null
 
@@ -98,136 +111,175 @@ export default function ComparativeChart({ data, year }) {
   const activeProjects = projects.filter(p => selectedProjects[p])
   const allSelected = projects.every(p => selectedProjects[p])
 
+  const toggleDataset = (datasetId) => {
+    setVisibleDatasets(prev => ({
+      ...prev,
+      [datasetId]: !prev[datasetId]
+    }))
+  }
+
   // Gráfico de Inventario
   const inventoryChartData = {
     labels: MONTHS,
-    datasets: activeProjects.map((proj, idx) => ({
-      type: 'line',
-      label: proj,
-      data: projectDataByMonth[proj].map(d => d ? d.inv : null),
-      borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
-      backgroundColor: 'transparent',
-      borderWidth: 2.5,
-      pointRadius: 4,
-      pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
-      pointBorderColor: '#ffffff',
-      pointBorderWidth: 2,
-      tension: 0.35,
-      spanGaps: false,
-    })),
+    datasets: activeProjects
+      .map((proj, idx) => ({
+        type: 'line',
+        label: proj,
+        datasetId: `inventory-${proj}`,
+        data: projectDataByMonth[proj].map(d => d ? d.inv : null),
+        borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        tension: 0.35,
+        spanGaps: false,
+        hidden: !visibleDatasets[`inventory-${proj}`],
+      })),
   }
 
   // Gráfico de Avance
   const advanceChartData = {
     labels: MONTHS,
-    datasets: activeProjects.map((proj, idx) => ({
-      type: 'line',
-      label: proj,
-      data: projectDataByMonth[proj].map(d => d ? d.avance : null),
-      borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
-      backgroundColor: 'transparent',
-      borderWidth: 2.5,
-      pointRadius: 4,
-      pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
-      pointBorderColor: '#ffffff',
-      pointBorderWidth: 2,
-      tension: 0.35,
-      spanGaps: false,
-    })),
+    datasets: activeProjects
+      .map((proj, idx) => ({
+        type: 'line',
+        label: proj,
+        datasetId: `advance-${proj}`,
+        data: projectDataByMonth[proj].map(d => d ? d.avance : null),
+        borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        tension: 0.35,
+        spanGaps: false,
+        hidden: !visibleDatasets[`advance-${proj}`],
+      })),
   }
 
-  const commonOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    layout: { padding: { top: 20 } },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: 'rgba(44,38,32,0.96)',
-        titleColor: '#ffffff',
-        bodyColor: '#b8b0a8',
-        borderColor: '#e8e4df',
-        borderWidth: 1,
-        padding: 12,
-        titleFont: { size: 12, weight: '600' },
-        bodyFont: { size: 11 },
-      },
-      datalabels: {
-        display(ctx) {
-          // Encontrar el último punto con datos válidos
-          const data = ctx.dataset.data
-          for (let i = data.length - 1; i >= 0; i--) {
-            if (data[i] !== null && data[i] !== undefined) {
-              return ctx.dataIndex === i
+  const createChartOptions = (chartType) => {
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#7a7269',
+            font: { size: 12, family: 'Inter', weight: '500' },
+            padding: 15,
+            usePointStyle: true,
+            pointStyle: 'circle',
+          },
+          onClick: (e, legendItem) => {
+            const datasetId = `${chartType}-${legendItem.text}`
+            toggleDataset(datasetId)
+          },
+        },
+        tooltip: {
+          backgroundColor: 'rgba(44,38,32,0.96)',
+          titleColor: '#ffffff',
+          bodyColor: '#b8b0a8',
+          borderColor: '#e8e4df',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { size: 12, weight: '600' },
+          bodyFont: { size: 11 },
+        },
+        datalabels: {
+          display(ctx) {
+            if (ctx.dataset.hidden) return false
+            // Encontrar el último punto con datos válidos
+            const data = ctx.dataset.data
+            for (let i = data.length - 1; i >= 0; i--) {
+              if (data[i] !== null && data[i] !== undefined) {
+                return ctx.dataIndex === i
+              }
             }
-          }
-          return false
+            return false
+          },
+          formatter(value, ctx) {
+            return ctx.dataset.label
+          },
+          color(ctx) {
+            return '#ffffff'
+          },
+          font: { size: 7, weight: '600', family: 'Inter' },
+          anchor: 'center',
+          align: 'right',
+          offset: 10,
+          backgroundColor(ctx) {
+            return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
+          },
+          borderRadius: 2,
+          padding: { top: 1, bottom: 1, left: 3, right: 3 },
         },
-        formatter(value, ctx) {
-          return ctx.dataset.label
-        },
-        color(ctx) {
-          return '#ffffff'
-        },
-        font: { size: 7, weight: '600', family: 'Inter' },
-        anchor: 'center',
-        align: 'right',
-        offset: 10,
-        backgroundColor(ctx) {
-          return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
-        },
-        borderRadius: 2,
-        padding: { top: 1, bottom: 1, left: 3, right: 3 },
       },
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        border: { color: '#e8e4df' },
-        ticks: { color: '#7a7269', font: { size: 10, family: 'Inter' } },
+      scales: {
+        x: {
+          grid: { display: false },
+          border: { color: '#e8e4df' },
+          ticks: { color: '#7a7269', font: { size: 10, family: 'Inter' } },
+        },
       },
-    },
+    }
+
+    if (chartType === 'inventory') {
+      return {
+        ...baseOptions,
+        scales: {
+          ...baseOptions.scales,
+          y: {
+            type: 'linear',
+            position: 'left',
+            grid: { color: 'rgba(200,200,200,0.2)' },
+            border: { display: false },
+            ticks: {
+              color: '#7a7269',
+              font: { size: 10, family: 'Inter' },
+              callback: v => fmtAxis(v),
+            },
+          },
+        },
+      }
+    }
+
+    if (chartType === 'advance') {
+      return {
+        ...baseOptions,
+        scales: {
+          ...baseOptions.scales,
+          y: {
+            type: 'linear',
+            position: 'left',
+            min: 0,
+            max: 100,
+            grid: { color: 'rgba(200,200,200,0.2)' },
+            border: { display: false },
+            ticks: {
+              color: '#7a7269',
+              font: { size: 10, family: 'Inter' },
+              callback: v => v + '%',
+              stepSize: 20,
+            },
+          },
+        },
+      }
+    }
+
+    return baseOptions
   }
 
-  const inventoryOptions = {
-    ...commonOptions,
-    scales: {
-      ...commonOptions.scales,
-      y: {
-        type: 'linear',
-        position: 'left',
-        grid: { color: 'rgba(200,200,200,0.2)' },
-        border: { display: false },
-        ticks: {
-          color: '#7a7269',
-          font: { size: 10, family: 'Inter' },
-          callback: v => fmtAxis(v),
-        },
-      },
-    },
-  }
-
-  const advanceOptions = {
-    ...commonOptions,
-    scales: {
-      ...commonOptions.scales,
-      y: {
-        type: 'linear',
-        position: 'left',
-        min: 0,
-        max: 100,
-        grid: { color: 'rgba(200,200,200,0.2)' },
-        border: { display: false },
-        ticks: {
-          color: '#7a7269',
-          font: { size: 10, family: 'Inter' },
-          callback: v => v + '%',
-          stepSize: 20,
-        },
-      },
-    },
-  }
+  const inventoryOptions = createChartOptions('inventory')
+  const advanceOptions = createChartOptions('advance')
 
   return (
     <div className={styles.container}>
