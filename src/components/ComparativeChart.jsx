@@ -122,10 +122,10 @@ export default function ComparativeChart({ data, year }) {
   const inventoryChartData = {
     labels: MONTHS,
     datasets: activeProjects
+      .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
       .map((proj, idx) => ({
         type: 'line',
         label: proj,
-        datasetId: `inventory-${proj}`,
         data: projectDataByMonth[proj].map(d => d ? d.inv : null),
         borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
         backgroundColor: 'transparent',
@@ -136,7 +136,6 @@ export default function ComparativeChart({ data, year }) {
         pointBorderWidth: 2,
         tension: 0.35,
         spanGaps: false,
-        hidden: !visibleDatasets[`inventory-${proj}`],
       })),
   }
 
@@ -144,10 +143,10 @@ export default function ComparativeChart({ data, year }) {
   const advanceChartData = {
     labels: MONTHS,
     datasets: activeProjects
+      .filter(proj => visibleDatasets[`advance-${proj}`] !== false)
       .map((proj, idx) => ({
         type: 'line',
         label: proj,
-        datasetId: `advance-${proj}`,
         data: projectDataByMonth[proj].map(d => d ? d.avance : null),
         borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
         backgroundColor: 'transparent',
@@ -158,7 +157,6 @@ export default function ComparativeChart({ data, year }) {
         pointBorderWidth: 2,
         tension: 0.35,
         spanGaps: false,
-        hidden: !visibleDatasets[`advance-${proj}`],
       })),
   }
 
@@ -196,7 +194,6 @@ export default function ComparativeChart({ data, year }) {
         },
         datalabels: {
           display(ctx) {
-            if (ctx.dataset.hidden) return false
             // Encontrar el último punto con datos válidos
             const data = ctx.dataset.data
             for (let i = data.length - 1; i >= 0; i--) {
