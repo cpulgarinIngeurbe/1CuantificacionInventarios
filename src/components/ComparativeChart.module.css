@@ -107,10 +107,98 @@
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: #2d5a3d;
+  margin: 0;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   margin-bottom: 18px;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: #7a7269;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.expandButton:hover {
+  background: #f9f7f4;
+  color: #2d5a3d;
 }
 
 .chartWrap {
   position: relative;
   height: 350px;
+}
+
+.expandedOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.expandedChart {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  height: 90vh;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #7a7269;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.closeButton:hover {
+  background: #f9f7f4;
+  color: #2d5a3d;
+}
+
+.expandedTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #2d5a3d;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.expandedChartWrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
 }

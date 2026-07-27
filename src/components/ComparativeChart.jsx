@@ -66,6 +66,7 @@ export default function ComparativeChart({ data, year }) {
   const { projects, projectDataByMonth } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})
   const [visibleDatasets, setVisibleDatasets] = useState({})
+  const [expandedChart, setExpandedChart] = useState(null)
   const inventoryChartRef = useRef(null)
   const advanceChartRef = useRef(null)
 
@@ -312,16 +313,66 @@ export default function ComparativeChart({ data, year }) {
         </div>
       </div>
 
+      {expandedChart && (
+        <div className={styles.expandedOverlay} onClick={() => setExpandedChart(null)}>
+          <div className={styles.expandedChart} onClick={e => e.stopPropagation()}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setExpandedChart(null)}
+              aria-label="Cerrar"
+            >
+              ✕
+            </button>
+            {expandedChart === 'inventory' && (
+              <>
+                <h3 className={styles.expandedTitle}>Inventario al cierre del mes (COP)</h3>
+                <div className={styles.expandedChartWrap}>
+                  <Chart type="line" data={inventoryChartData} options={inventoryOptions} />
+                </div>
+              </>
+            )}
+            {expandedChart === 'advance' && (
+              <>
+                <h3 className={styles.expandedTitle}>Avance acumulado de obra (%)</h3>
+                <div className={styles.expandedChartWrap}>
+                  <Chart type="line" data={advanceChartData} options={advanceOptions} />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className={styles.chartsGrid}>
         <div className={styles.chartCard}>
-          <h3 className={styles.chartTitle}>Inventario al cierre del mes (COP)</h3>
+          <div className={styles.chartHeader}>
+            <h3 className={styles.chartTitle}>Inventario al cierre del mes (COP)</h3>
+            <button
+              className={styles.expandButton}
+              onClick={() => setExpandedChart('inventory')}
+              aria-label="Expandir"
+              title="Expandir gráfico"
+            >
+              ⛶
+            </button>
+          </div>
           <div className={styles.chartWrap}>
             <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
           </div>
         </div>
 
         <div className={styles.chartCard}>
-          <h3 className={styles.chartTitle}>Avance acumulado de obra (%)</h3>
+          <div className={styles.chartHeader}>
+            <h3 className={styles.chartTitle}>Avance acumulado de obra (%)</h3>
+            <button
+              className={styles.expandButton}
+              onClick={() => setExpandedChart('advance')}
+              aria-label="Expandir"
+              title="Expandir gráfico"
+            >
+              ⛶
+            </button>
+          </div>
           <div className={styles.chartWrap}>
             <Chart ref={advanceChartRef} type="line" data={advanceChartData} options={advanceOptions} />
           </div>
