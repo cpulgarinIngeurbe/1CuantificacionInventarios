@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale,
@@ -66,6 +66,8 @@ export default function ComparativeChart({ data, year }) {
   const { projects, projectDataByMonth } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})
   const [visibleDatasets, setVisibleDatasets] = useState({})
+  const inventoryChartRef = useRef(null)
+  const advanceChartRef = useRef(null)
 
   // Sincronizar selectedProjects cuando cambien los proyectos
   useEffect(() => {
@@ -164,14 +166,15 @@ export default function ComparativeChart({ data, year }) {
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: true },
+      interaction: { mode: 'nearest', intersect: true },
       layout: { padding: { top: 20 } },
-      onClick: (event, elements) => {
+      onClick: (event, elements, chart) => {
         if (elements.length > 0) {
           const element = elements[0]
-          const datasetLabel = element.element.$context.raw !== null ? element.element.$context.dataset.label : null
-          if (datasetLabel) {
-            const datasetId = `${chartType}-${datasetLabel}`
+          const datasetIndex = element.datasetIndex
+          const dataset = chart.data.datasets[datasetIndex]
+          if (dataset && dataset.label) {
+            const datasetId = `${chartType}-${dataset.label}`
             toggleDataset(datasetId)
           }
         }
@@ -320,14 +323,14 @@ export default function ComparativeChart({ data, year }) {
         <div className={styles.chartCard}>
           <h3 className={styles.chartTitle}>Inventario al cierre del mes (COP)</h3>
           <div className={styles.chartWrap}>
-            <Chart type="line" data={inventoryChartData} options={inventoryOptions} />
+            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
           </div>
         </div>
 
         <div className={styles.chartCard}>
           <h3 className={styles.chartTitle}>Avance acumulado de obra (%)</h3>
           <div className={styles.chartWrap}>
-            <Chart type="line" data={advanceChartData} options={advanceOptions} />
+            <Chart ref={advanceChartRef} type="line" data={advanceChartData} options={advanceOptions} />
           </div>
         </div>
       </div>
