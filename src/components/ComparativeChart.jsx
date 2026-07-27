@@ -164,8 +164,18 @@ export default function ComparativeChart({ data, year }) {
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+      interaction: { mode: 'index', intersect: true },
       layout: { padding: { top: 20 } },
+      onClick: (event, elements) => {
+        if (elements.length > 0) {
+          const element = elements[0]
+          const datasetLabel = element.element.$context.raw !== null ? element.element.$context.dataset.label : null
+          if (datasetLabel) {
+            const datasetId = `${chartType}-${datasetLabel}`
+            toggleDataset(datasetId)
+          }
+        }
+      },
       plugins: {
         legend: {
           display: true,
