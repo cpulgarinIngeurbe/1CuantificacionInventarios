@@ -39,10 +39,55 @@ const DEFAULT_COLORS = [
   '#f0a66a', '#6fb3d9', '#b8b8b8', '#d9a680', '#80d9b8',
 ]
 
+const STAGES = ['Arranque', 'Ejecución', 'Cierre']
+const STAGE_RANGE_LABEL = {
+  Arranque: '0% - 15%',
+  'Ejecución': '15% - 60%',
+  Cierre: '60%+',
+}
+
+function stageForAvance(avance) {
+  if (avance === null || avance === undefined) return null
+  if (avance < 15) return 'Arranque'
+  if (avance < 60) return 'Ejecución'
+  return 'Cierre'
+}
+
 export default function ComparativeChart({ data, year }) {
+  const [selectedStages, setSelectedStages] = useState(() =>
+    STAGES.reduce((acc, s) => { acc[s] = true; return acc }, {})
+  )
+
+  // Etapa de cada proyecto según su último avance conocido (independiente del año filtrado)
+  const stageByProject = useMemo(() => {
+    const rowsByProject = {}
+    data.forEach(d => {
+      if (!rowsByProject[d.proyecto]) rowsByProject[d.proyecto] = []
+      rowsByProject[d.proyecto].push(d)
+    })
+    const map = {}
+    Object.entries(rowsByProject).forEach(([proj, rows]) => {
+      const sorted = [...rows].sort((a, b) => (a.year - b.year) || (a.month - b.month))
+      let lastAvance = null
+      for (let i = sorted.length - 1; i >= 0; i--) {
+        if (sorted[i].avanceObra !== null && sorted[i].avanceObra !== undefined) {
+          lastAvance = sorted[i].avanceObra
+          break
+        }
+      }
+      map[proj] = stageForAvance(lastAvance)
+    })
+    return map
+  }, [data])
+
+  const toggleStage = (stage) => {
+    setSelectedStages(prev => ({ ...prev, [stage]: !prev[stage] }))
+  }
+
   const processedData = useMemo(() => {
     const filteredData = year ? data.filter(d => d.year === Number(year)) : data
-    const projects = [...new Set(filteredData.map(d => d.proyecto))].sort()
+    const allProjects = [...new Set(filteredData.map(d => d.proyecto))].sort()
+    const projects = allProjects.filter(p => selectedStages[stageByProject[p]] !== false)
 
     // Sin año filtrado: línea de tiempo cronológica multi-año. Con año filtrado: 12 meses fijos.
     let periods
@@ -78,7 +123,7 @@ export default function ComparativeChart({ data, year }) {
     })
 
     return { projects, periods, projectDataByPeriod }
-  }, [data, year])
+  }, [data, year, selectedStages, stageByProject])
 
   const { projects, periods, projectDataByPeriod } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})
@@ -312,6 +357,25 @@ export default function ComparativeChart({ data, year }) {
 
   return (
     <div className={styles.container}>
+      <div className={styles.filterSection}>
+        <div className={styles.filterHeader}>
+          <label className={styles.filterTitle}>Filtrar por Etapa de Avance</label>
+        </div>
+        <div className={styles.filterGrid}>
+          {STAGES.map(stage => (
+            <label key={stage} className={styles.filterItem}>
+              <input
+                type="checkbox"
+                checked={!!selectedStages[stage]}
+                onChange={() => toggleStage(stage)}
+                className={styles.checkbox}
+              />
+              <span className={styles.filterLabel}>{stage} ({STAGE_RANGE_LABEL[stage]})</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className={styles.filterSection}>
         <div className={styles.filterHeader}>
           <label className={styles.filterTitle}>Seleccionar Proyectos</label>
