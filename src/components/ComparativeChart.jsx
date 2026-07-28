@@ -44,26 +44,43 @@ export default function ComparativeChart({ data, year }) {
     const filteredData = year ? data.filter(d => d.year === Number(year)) : data
     const projects = [...new Set(filteredData.map(d => d.proyecto))].sort()
 
-    const projectDataByMonth = {}
+    // Sin año filtrado: línea de tiempo cronológica multi-año. Con año filtrado: 12 meses fijos.
+    let periods
+    if (year) {
+      periods = MONTHS.map((label, month) => ({ key: String(month), label }))
+    } else {
+      const seen = new Map()
+      filteredData.forEach(d => {
+        const key = `${d.year}-${d.month}`
+        if (!seen.has(key)) seen.set(key, { year: d.year, month: d.month })
+      })
+      periods = [...seen.values()]
+        .sort((a, b) => a.year - b.year || a.month - b.month)
+        .map(p => ({ key: `${p.year}-${p.month}`, label: `${MONTHS[p.month]} ${String(p.year).slice(-2)}` }))
+    }
+    const periodIndexByKey = new Map(periods.map((p, i) => [p.key, i]))
+
+    const projectDataByPeriod = {}
     projects.forEach(proj => {
-      projectDataByMonth[proj] = Array(12).fill(null)
+      projectDataByPeriod[proj] = Array(periods.length).fill(null)
     })
 
     filteredData.forEach(row => {
       const proj = row.proyecto
-      const month = row.month
-      if (projectDataByMonth[proj] && month >= 0 && month < 12) {
-        projectDataByMonth[proj][month] = {
+      const key = year ? String(row.month) : `${row.year}-${row.month}`
+      const idx = periodIndexByKey.get(key)
+      if (projectDataByPeriod[proj] && idx !== undefined) {
+        projectDataByPeriod[proj][idx] = {
           inv: row.inventarioFinal || 0,
           avance: row.avanceObra || 0,
         }
       }
     })
 
-    return { projects, projectDataByMonth }
+    return { projects, periods, projectDataByPeriod }
   }, [data, year])
 
-  const { projects, projectDataByMonth } = processedData
+  const { projects, periods, projectDataByPeriod } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})
   const [visibleDatasets, setVisibleDatasets] = useState({})
   const [expandedChart, setExpandedChart] = useState(null)
@@ -124,13 +141,13 @@ export default function ComparativeChart({ data, year }) {
 
   // Gráfico de Inventario
   const inventoryChartData = {
-    labels: MONTHS,
+    labels: periods.map(p => p.label),
     datasets: activeProjects
       .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
       .map((proj, idx) => ({
         type: 'line',
         label: proj,
-        data: projectDataByMonth[proj].map(d => d ? d.inv : null),
+        data: projectDataByPeriod[proj].map(d => d ? d.inv : null),
         borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
         backgroundColor: 'transparent',
         borderWidth: 2.5,
@@ -145,13 +162,13 @@ export default function ComparativeChart({ data, year }) {
 
   // Gráfico de Avance
   const advanceChartData = {
-    labels: MONTHS,
+    labels: periods.map(p => p.label),
     datasets: activeProjects
       .filter(proj => visibleDatasets[`advance-${proj}`] !== false)
       .map((proj, idx) => ({
         type: 'line',
         label: proj,
-        data: projectDataByMonth[proj].map(d => d ? d.avance : null),
+        data: projectDataByPeriod[proj].map(d => d ? d.avance : null),
         borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
         backgroundColor: 'transparent',
         borderWidth: 2.5,
@@ -191,7 +208,7 @@ export default function ComparativeChart({ data, year }) {
               const label = ctx.dataset.label
               let text = `${label}: ${ctx.formattedValue}`
               if (chartType === 'inventory') {
-                const avance = projectDataByMonth[label]?.[ctx.dataIndex]?.avance
+                const avance = projectDataByPeriod[label]?.[ctx.dataIndex]?.avance
                 if (avance !== null && avance !== undefined) {
                   text += ` (${Math.round(avance)}%)`
                 }
@@ -214,7 +231,7 @@ export default function ComparativeChart({ data, year }) {
           formatter(value, ctx) {
             const label = ctx.dataset.label
             if (chartType === 'inventory') {
-              const avance = projectDataByMonth[label]?.[ctx.dataIndex]?.avance
+              const avance = projectDataByPeriod[label]?.[ctx.dataIndex]?.avance
               if (avance !== null && avance !== undefined) {
                 return `${label}  ${Math.round(avance)}%`
               }

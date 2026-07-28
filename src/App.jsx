@@ -21,12 +21,8 @@ export default function App() {
     }
   }, [projects])
 
-  React.useEffect(() => {
-    if (years.length) setYear(years[years.length - 1])
-  }, [years])
-
   const filteredRows = useMemo(() =>
-    data.filter(d => d.proyecto === project && d.year === Number(year)),
+    data.filter(d => d.proyecto === project && (year === '' || d.year === Number(year))),
     [data, project, year]
   )
 

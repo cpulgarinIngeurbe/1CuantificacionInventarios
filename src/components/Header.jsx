@@ -23,7 +23,8 @@ export default function Header({ projects, years, project, year, onProjectChange
           </div>
           <div className={styles.filterGroup}>
             <label className={styles.filterLabel}>Año</label>
-            <select className={styles.select} value={year} onChange={e => onYearChange(Number(e.target.value))}>
+            <select className={styles.select} value={year} onChange={e => onYearChange(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Todos</option>
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>

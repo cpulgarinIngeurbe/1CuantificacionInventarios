@@ -49,9 +49,11 @@ const C = {
 
 export default function InventoryChart({ rows }) {
   const sorted = useMemo(() =>
-    [...rows].sort((a, b) => a.month - b.month), [rows])
+    [...rows].sort((a, b) => (a.year - b.year) || (a.month - b.month)), [rows])
 
-  const labels   = sorted.map(d => MONTHS[d.month])
+  const multiYear = useMemo(() => new Set(sorted.map(d => d.year)).size > 1, [sorted])
+
+  const labels   = sorted.map(d => multiYear ? `${MONTHS[d.month]} ${String(d.year).slice(-2)}` : MONTHS[d.month])
   const entradas = sorted.map(d => d.entradasAlmacen + d.entradasTraslados + d.reintegrosObra + d.entradasBodega)
   const salidas  = sorted.map(d => -(Math.abs(d.salidasAlmacen) + Math.abs(d.salidasTraslados) + Math.abs(d.devolucionesProv) + Math.abs(d.salidasBodega)))
   const invFinal = sorted.map(d => d.inventarioFinal)
