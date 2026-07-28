@@ -233,7 +233,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: chartType === 'inventory' ? 150 : 120 } },
+      layout: { padding: { top: 20, right: chartType === 'inventory' ? 190 : 150 } },
       plugins: {
         legend: {
           display: false,
@@ -288,15 +288,15 @@ export default function ComparativeChart({ data, selectedYears }) {
           color(ctx) {
             return '#ffffff'
           },
-          font: { size: 7, weight: '600', family: 'Inter' },
+          font: { size: 14, weight: '600', family: 'Inter' },
           anchor: 'center',
           align: 'right',
           offset: 10,
           backgroundColor(ctx) {
             return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
           },
-          borderRadius: 2,
-          padding: { top: 1, bottom: 1, left: 3, right: 3 },
+          borderRadius: 4,
+          padding: { top: 2, bottom: 2, left: 6, right: 6 },
         },
       },
       scales: {
