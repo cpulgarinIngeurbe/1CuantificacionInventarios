@@ -183,6 +183,22 @@ export default function ComparativeChart({ data, year }) {
           padding: 12,
           titleFont: { size: 12, weight: '600' },
           bodyFont: { size: 11 },
+          itemSort(a, b) {
+            return (b.parsed.y ?? -Infinity) - (a.parsed.y ?? -Infinity)
+          },
+          callbacks: {
+            label(ctx) {
+              const label = ctx.dataset.label
+              let text = `${label}: ${ctx.formattedValue}`
+              if (chartType === 'inventory') {
+                const avance = projectDataByMonth[label]?.[ctx.dataIndex]?.avance
+                if (avance !== null && avance !== undefined) {
+                  text += ` (${Math.round(avance)}%)`
+                }
+              }
+              return text
+            },
+          },
         },
         datalabels: {
           display(ctx) {
