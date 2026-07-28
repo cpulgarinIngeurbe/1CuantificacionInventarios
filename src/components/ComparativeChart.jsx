@@ -288,15 +288,15 @@ export default function ComparativeChart({ data, selectedYears }) {
           color(ctx) {
             return '#ffffff'
           },
-          font: { size: 14, weight: '600', family: 'Inter' },
+          font: { size: 8, weight: '600', family: 'Inter' },
           anchor: 'center',
           align: 'right',
           offset: 10,
           backgroundColor(ctx) {
             return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
           },
-          borderRadius: 4,
-          padding: { top: 2, bottom: 2, left: 6, right: 6 },
+          borderRadius: 2,
+          padding: { top: 1, bottom: 1, left: 3, right: 3 },
         },
       },
       scales: {
