@@ -169,7 +169,7 @@ export default function ComparativeChart({ data, year }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: 120 } },
+      layout: { padding: { top: 20, right: chartType === 'inventory' ? 150 : 120 } },
       plugins: {
         legend: {
           display: false,
@@ -196,7 +196,14 @@ export default function ComparativeChart({ data, year }) {
             return false
           },
           formatter(value, ctx) {
-            return ctx.dataset.label
+            const label = ctx.dataset.label
+            if (chartType === 'inventory') {
+              const avance = projectDataByMonth[label]?.[ctx.dataIndex]?.avance
+              if (avance !== null && avance !== undefined) {
+                return `${label}  ${Math.round(avance)}%`
+              }
+            }
+            return label
           },
           color(ctx) {
             return '#ffffff'
