@@ -11,8 +11,8 @@ export default function App() {
   const projects = useMemo(() => [...new Set(data.map(d => d.proyecto))].sort(), [data])
   const years    = useMemo(() => [...new Set(data.map(d => d.year))].sort(), [data])
 
-  const [project, setProject] = useState('')
-  const [year, setYear]       = useState('')
+  const [project, setProject]           = useState('')
+  const [selectedYears, setSelectedYears] = useState([])
 
   React.useEffect(() => {
     if (projects.length) {
@@ -22,8 +22,8 @@ export default function App() {
   }, [projects])
 
   const filteredRows = useMemo(() =>
-    data.filter(d => d.proyecto === project && (year === '' || d.year === Number(year))),
-    [data, project, year]
+    data.filter(d => d.proyecto === project && (selectedYears.length === 0 || selectedYears.includes(d.year))),
+    [data, project, selectedYears]
   )
 
   return (
@@ -32,9 +32,9 @@ export default function App() {
         projects={projects}
         years={years}
         project={project}
-        year={year}
+        selectedYears={selectedYears}
         onProjectChange={setProject}
-        onYearChange={setYear}
+        onYearsChange={setSelectedYears}
         loading={loading}
       />
       <main className={styles.main}>
@@ -47,7 +47,7 @@ export default function App() {
           </div>
         )}
         <InventoryChart rows={filteredRows} loading={loading} />
-        <ComparativeChart data={data} year={year} />
+        <ComparativeChart data={data} selectedYears={selectedYears} />
       </main>
     </div>
   )

@@ -20,8 +20,7 @@ const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov
 
 function fmtAxis(v) {
   const abs = Math.abs(v)
-  if (abs >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' B'
-  if (abs >= 1e6) return Math.round(v / 1e6) + ' M'
+  if (abs >= 1e6) return Math.round(v / 1e6) + ' MM'
   if (abs >= 1e3) return Math.round(v / 1e3) + ' K'
   return v.toFixed(0)
 }
@@ -53,7 +52,7 @@ function stageForAvance(avance) {
   return 'Cierre'
 }
 
-export default function ComparativeChart({ data, year }) {
+export default function ComparativeChart({ data, selectedYears }) {
   const [selectedStages, setSelectedStages] = useState(() =>
     STAGES.reduce((acc, s) => { acc[s] = true; return acc }, {})
   )
@@ -85,13 +84,16 @@ export default function ComparativeChart({ data, year }) {
   }
 
   const processedData = useMemo(() => {
-    const filteredData = year ? data.filter(d => d.year === Number(year)) : data
+    const filteredData = selectedYears.length === 0
+      ? data
+      : data.filter(d => selectedYears.includes(d.year))
     const allProjects = [...new Set(filteredData.map(d => d.proyecto))].sort()
     const projects = allProjects.filter(p => selectedStages[stageByProject[p]] !== false)
 
-    // Sin año filtrado: línea de tiempo cronológica multi-año. Con año filtrado: 12 meses fijos.
+    // Un solo año seleccionado: 12 meses fijos. Todos o varios años: línea de tiempo cronológica.
+    const singleYear = selectedYears.length === 1
     let periods
-    if (year) {
+    if (singleYear) {
       periods = MONTHS.map((label, month) => ({ key: String(month), label }))
     } else {
       const seen = new Map()
@@ -112,7 +114,7 @@ export default function ComparativeChart({ data, year }) {
 
     filteredData.forEach(row => {
       const proj = row.proyecto
-      const key = year ? String(row.month) : `${row.year}-${row.month}`
+      const key = singleYear ? String(row.month) : `${row.year}-${row.month}`
       const idx = periodIndexByKey.get(key)
       if (projectDataByPeriod[proj] && idx !== undefined) {
         projectDataByPeriod[proj][idx] = {
@@ -123,7 +125,7 @@ export default function ComparativeChart({ data, year }) {
     })
 
     return { projects, periods, projectDataByPeriod }
-  }, [data, year, selectedStages, stageByProject])
+  }, [data, selectedYears, selectedStages, stageByProject])
 
   const { projects, periods, projectDataByPeriod } = processedData
   const [selectedProjects, setSelectedProjects] = useState({})

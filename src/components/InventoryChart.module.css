@@ -60,7 +60,14 @@
   gap: 7px;
   font-size: 0.74rem;
   color: #7a7269;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
 }
+
+.legendItem:hover { color: #2c2620; }
+
+.legendItemHidden { opacity: 0.35; }
 
 .legendBox {
   width: 13px;

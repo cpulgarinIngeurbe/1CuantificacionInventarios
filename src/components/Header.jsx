@@ -1,7 +1,32 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styles from './Header.module.css'
 
-export default function Header({ projects, years, project, year, onProjectChange, onYearChange, loading }) {
+export default function Header({ projects, years, project, selectedYears, onProjectChange, onYearsChange, loading }) {
+  const [yearMenuOpen, setYearMenuOpen] = useState(false)
+  const yearMenuRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (yearMenuRef.current && !yearMenuRef.current.contains(e.target)) {
+        setYearMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const toggleYear = (y) => {
+    if (selectedYears.includes(y)) {
+      onYearsChange(selectedYears.filter(x => x !== y))
+    } else {
+      onYearsChange([...selectedYears, y].sort((a, b) => a - b))
+    }
+  }
+
+  const yearLabel = selectedYears.length === 0
+    ? 'Todos'
+    : [...selectedYears].sort((a, b) => a - b).join(', ')
+
   return (
     <header className={styles.header}>
       <img src="/1CuantificacionInventarios/logo.png" alt="Ingeurbe" className={styles.logo} />
@@ -21,12 +46,37 @@ export default function Header({ projects, years, project, year, onProjectChange
               {projects.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
-          <div className={styles.filterGroup}>
+          <div className={styles.filterGroup} ref={yearMenuRef} style={{ position: 'relative' }}>
             <label className={styles.filterLabel}>Año</label>
-            <select className={styles.select} value={year} onChange={e => onYearChange(e.target.value === '' ? '' : Number(e.target.value))}>
-              <option value="">Todos</option>
-              {years.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
+            <button
+              type="button"
+              className={styles.select}
+              onClick={() => setYearMenuOpen(o => !o)}
+            >
+              {yearLabel}
+            </button>
+            {yearMenuOpen && (
+              <div className={styles.yearDropdown}>
+                <label className={styles.yearOption}>
+                  <input
+                    type="checkbox"
+                    checked={selectedYears.length === 0}
+                    onChange={() => onYearsChange([])}
+                  />
+                  Todos
+                </label>
+                {years.map(y => (
+                  <label key={y} className={styles.yearOption}>
+                    <input
+                      type="checkbox"
+                      checked={selectedYears.includes(y)}
+                      onChange={() => toggleYear(y)}
+                    />
+                    {y}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

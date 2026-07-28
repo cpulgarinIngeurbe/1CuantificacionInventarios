@@ -91,3 +91,35 @@
 .select option { background: #ffffff; color: #2c2620; }
 .select:focus { border-color: #2d5a3d; }
 .select:hover { border-color: #7a7269; }
+
+.yearDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e8e4df;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(44,38,32,0.12);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 130px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 200;
+}
+
+.yearOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #2c2620;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.yearOption:hover { background: #f9f7f4; }

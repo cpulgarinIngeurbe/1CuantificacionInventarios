@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   Chart as ChartJS,
   CategoryScale, LinearScale,
@@ -29,8 +29,7 @@ function fmtFull(v) {
 // Formato compacto para ejes
 function fmtAxis(v) {
   const abs = Math.abs(v)
-  if (abs >= 1e9) return (v / 1e9).toFixed(1).replace(/\.0$/, '') + ' B'
-  if (abs >= 1e6) return Math.round(v / 1e6) + ' M'
+  if (abs >= 1e6) return Math.round(v / 1e6) + ' MM'
   if (abs >= 1e3) return Math.round(v / 1e3) + ' K'
   return v.toFixed(0)
 }
@@ -48,6 +47,12 @@ const C = {
 }
 
 export default function InventoryChart({ rows }) {
+  const [hiddenSets, setHiddenSets] = useState({})
+
+  const toggleSet = (key) => {
+    setHiddenSets(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
   const sorted = useMemo(() =>
     [...rows].sort((a, b) => (a.year - b.year) || (a.month - b.month)), [rows])
 
@@ -71,6 +76,7 @@ export default function InventoryChart({ rows }) {
         borderRadius: { topLeft: 4, topRight: 4 },
         yAxisID: 'yCOP',
         order: 3,
+        hidden: !!hiddenSets[0],
       },
       {
         type: 'bar',
@@ -81,6 +87,7 @@ export default function InventoryChart({ rows }) {
         borderRadius: { bottomLeft: 4, bottomRight: 4 },
         yAxisID: 'yCOP',
         order: 3,
+        hidden: !!hiddenSets[1],
       },
       {
         type: 'line',
@@ -95,7 +102,8 @@ export default function InventoryChart({ rows }) {
         pointBorderWidth: 2,
         tension: 0.35,
         yAxisID: 'yCOP',
-        order: 1,
+        order: -1,
+        hidden: !!hiddenSets[2],
       },
       {
         type: 'line',
@@ -106,6 +114,7 @@ export default function InventoryChart({ rows }) {
         borderWidth: 2.5,
         pointRadius: 5,
         pointBackgroundColor: C.avanceLine,
+        hidden: !!hiddenSets[3],
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         tension: 0.35,
@@ -255,12 +264,16 @@ export default function InventoryChart({ rows }) {
 
       <div className={styles.legend}>
         {[
-          { color: C.entradas,   type: 'box',  label: 'Entradas: compras / recepciones de almacén' },
-          { color: C.salidas,    type: 'box',  label: 'Salidas: consumo en obra' },
-          { color: C.invLine,    type: 'line', label: 'Inventario al cierre del mes' },
-          { color: C.avanceLine, type: 'line', label: 'Avance acumulado de obra' },
+          { key: 0, color: C.entradas,   type: 'box',  label: 'Entradas: compras / recepciones de almacén' },
+          { key: 1, color: C.salidas,    type: 'box',  label: 'Salidas: consumo en obra' },
+          { key: 2, color: C.invLine,    type: 'line', label: 'Inventario al cierre del mes' },
+          { key: 3, color: C.avanceLine, type: 'line', label: 'Avance acumulado de obra' },
         ].map(item => (
-          <div key={item.label} className={styles.legendItem}>
+          <div
+            key={item.key}
+            className={`${styles.legendItem} ${hiddenSets[item.key] ? styles.legendItemHidden : ''}`}
+            onClick={() => toggleSet(item.key)}
+          >
             {item.type === 'box'
               ? <span className={styles.legendBox} style={{ background: item.color }} />
               : <span className={styles.legendLine} style={{ background: item.color }} />
