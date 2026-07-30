@@ -170,6 +170,19 @@ export default function ComparativeChart({ data, selectedYears }) {
   }, [data, selectedYears, selectedStages, stageByProject])
 
   const { projects, periods, projectDataByPeriod } = processedData
+
+  // Promedio de inventario por proyecto, según los períodos visibles con el filtro actual
+  const avgInvByProject = useMemo(() => {
+    const map = {}
+    projects.forEach(proj => {
+      const vals = projectDataByPeriod[proj]
+        .filter(d => d && d.inv !== null && d.inv !== undefined)
+        .map(d => d.inv)
+      map[proj] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+    })
+    return map
+  }, [projects, projectDataByPeriod])
+
   const [selectedProjects, setSelectedProjects] = useState({})
   const [visibleDatasets, setVisibleDatasets] = useState({})
   const [expandedChart, setExpandedChart] = useState(null)
@@ -227,18 +240,6 @@ export default function ComparativeChart({ data, selectedYears }) {
       [datasetId]: !prev[datasetId]
     }))
   }
-
-  // Promedio de inventario por proyecto, según los períodos visibles con el filtro actual
-  const avgInvByProject = useMemo(() => {
-    const map = {}
-    projects.forEach(proj => {
-      const vals = projectDataByPeriod[proj]
-        .filter(d => d && d.inv !== null && d.inv !== undefined)
-        .map(d => d.inv)
-      map[proj] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
-    })
-    return map
-  }, [projects, projectDataByPeriod])
 
   // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto)
   const inventoryLabels = [...periods.map(p => p.label), 'Prom.']
