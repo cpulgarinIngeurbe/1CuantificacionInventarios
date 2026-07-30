@@ -241,45 +241,72 @@ export default function ComparativeChart({ data, selectedYears }) {
     }))
   }
 
-  // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto,
-  // separada del resto por columnas vacías para que quede bien a la derecha)
-  const AVG_GAP_COLUMNS = 12
-  const gapLabels = Array(AVG_GAP_COLUMNS).fill('')
-  const gapNulls = Array(AVG_GAP_COLUMNS).fill(null)
-  const inventoryLabels = [...periods.map(p => p.label), ...gapLabels, 'Prom.']
+  // Gráfico de Inventario
   const inventoryChartData = {
-    labels: inventoryLabels,
+    labels: periods.map(p => p.label),
     datasets: activeProjects
       .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
-      .flatMap((proj, idx) => {
-        const color = colorByProject[proj]
-        const lineDataset = {
-          type: 'line',
-          label: proj,
-          data: [...projectDataByPeriod[proj].map(d => d ? d.inv : null), ...gapNulls, null],
-          borderColor: color,
-          backgroundColor: 'transparent',
-          borderWidth: 2.5,
-          pointRadius: 4,
-          pointBackgroundColor: color,
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          tension: 0.35,
-          spanGaps: false,
-        }
-        const avgDataset = {
-          type: 'line',
-          label: `${proj} (promedio)`,
-          data: [...periods.map(() => null), ...gapNulls, avgInvByProject[proj]],
-          showLine: false,
-          pointRadius: 7,
-          pointBackgroundColor: color,
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          datalabels: { display: false },
-        }
-        return [lineDataset, avgDataset]
-      }),
+      .map(proj => ({
+        type: 'line',
+        label: proj,
+        data: projectDataByPeriod[proj].map(d => d ? d.inv : null),
+        borderColor: colorByProject[proj],
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: colorByProject[proj],
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        tension: 0.35,
+        spanGaps: false,
+      })),
+  }
+
+  // Columna de círculos de promedio: se dibuja directamente sobre el mismo eje Y del gráfico
+  // (misma escala que las curvas), separada a la derecha de las etiquetas de fin de curva,
+  // y con un mínimo de espacio vertical entre círculos para que no se superpongan entre sí.
+  const avgMarkerColumn = activeProjects
+    .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
+    .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
+    .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
+
+  const avgMarkersPlugin = {
+    id: 'avgMarkers',
+    afterDatasetsDraw(chart) {
+      const scaleY = chart.scales && chart.scales.y
+      if (!scaleY || avgMarkerColumn.length === 0) return
+      const { ctx, chartArea } = chart
+      const x = chartArea.right + 200
+      const MIN_GAP = 18
+
+      const items = avgMarkerColumn
+        .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
+        .sort((a, b) => a.rawY - b.rawY)
+
+      let prevY = -Infinity
+      items.forEach(item => {
+        item.y = Math.max(item.rawY, prevY + MIN_GAP)
+        prevY = item.y
+      })
+
+      ctx.save()
+      items.forEach(item => {
+        ctx.beginPath()
+        ctx.arc(x, item.y, 6, 0, Math.PI * 2)
+        ctx.fillStyle = item.color
+        ctx.fill()
+        ctx.lineWidth = 1.5
+        ctx.strokeStyle = '#ffffff'
+        ctx.stroke()
+
+        ctx.fillStyle = '#2c2620'
+        ctx.font = "600 10px 'Inter', sans-serif"
+        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'left'
+        ctx.fillText(fmtAxis(item.value), x + 11, item.y)
+      })
+      ctx.restore()
+    },
   }
 
   // Gráfico de Avance
@@ -308,7 +335,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: chartType === 'inventory' ? 190 : 150 } },
+      layout: { padding: { top: 20, right: chartType === 'inventory' ? 280 : 150 } },
       plugins: {
         legend: {
           display: false,
@@ -493,7 +520,7 @@ export default function ComparativeChart({ data, selectedYears }) {
               <>
                 <h3 className={styles.expandedTitle}>Inventario al cierre del mes (COP)</h3>
                 <div className={styles.expandedChartWrap}>
-                  <Chart type="line" data={inventoryChartData} options={inventoryOptions} />
+                  <Chart type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
                 </div>
               </>
             )}
@@ -523,7 +550,7 @@ export default function ComparativeChart({ data, selectedYears }) {
             </button>
           </div>
           <div className={styles.chartWrap}>
-            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
+            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
           </div>
           <div className={styles.customLegend}>
             {activeProjects.map((proj, idx) => (
