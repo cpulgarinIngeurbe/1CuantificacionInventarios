@@ -33,6 +33,8 @@ function fmtCOP(v) {
 // Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
 // `plugins` en el montaje inicial, así que los datos a dibujar viajan por `options.plugins.avgMarkers`,
 // que sí se actualiza en cada render y llega "fresco" a este hook en cada dibujo.
+// Cada círculo se posiciona en el valor real de su promedio sobre el mismo eje Y de las curvas,
+// con un mínimo de espacio vertical entre ellos para que no se superpongan.
 const avgMarkersPlugin = {
   id: 'avgMarkers',
   afterDatasetsDraw(chart, _args, pluginOptions) {
@@ -40,7 +42,7 @@ const avgMarkersPlugin = {
     const scaleY = chart.scales && chart.scales.y
     if (!scaleY || markers.length === 0) return
     const { ctx, chartArea } = chart
-    const x = chartArea.right + 210
+    const dotX = chartArea.right + 210
     const MIN_GAP = 18
 
     const items = markers
@@ -56,7 +58,7 @@ const avgMarkersPlugin = {
     ctx.save()
     items.forEach(item => {
       ctx.beginPath()
-      ctx.arc(x, item.y, 6, 0, Math.PI * 2)
+      ctx.arc(dotX, item.y, 6, 0, Math.PI * 2)
       ctx.fillStyle = item.color
       ctx.fill()
       ctx.lineWidth = 1.5
@@ -67,7 +69,7 @@ const avgMarkersPlugin = {
       ctx.font = "600 10px 'Inter', sans-serif"
       ctx.textBaseline = 'middle'
       ctx.textAlign = 'left'
-      ctx.fillText(fmtCOP(item.value), x + 11, item.y)
+      ctx.fillText(`${item.proj}  ${fmtCOP(item.value)}`, dotX + 11, item.y)
     })
     ctx.restore()
   },
@@ -339,7 +341,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: chartType === 'inventory' ? 340 : 150 } },
+      layout: { padding: { top: 20, right: chartType === 'inventory' ? 460 : 150 } },
       plugins: {
         legend: {
           display: false,
