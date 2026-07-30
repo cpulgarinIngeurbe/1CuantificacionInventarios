@@ -228,25 +228,53 @@ export default function ComparativeChart({ data, selectedYears }) {
     }))
   }
 
-  // Gráfico de Inventario
+  // Promedio de inventario por proyecto, según los períodos visibles con el filtro actual
+  const avgInvByProject = useMemo(() => {
+    const map = {}
+    projects.forEach(proj => {
+      const vals = projectDataByPeriod[proj]
+        .filter(d => d && d.inv !== null && d.inv !== undefined)
+        .map(d => d.inv)
+      map[proj] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+    })
+    return map
+  }, [projects, projectDataByPeriod])
+
+  // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto)
+  const inventoryLabels = [...periods.map(p => p.label), 'Prom.']
   const inventoryChartData = {
-    labels: periods.map(p => p.label),
+    labels: inventoryLabels,
     datasets: activeProjects
       .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
-      .map((proj, idx) => ({
-        type: 'line',
-        label: proj,
-        data: projectDataByPeriod[proj].map(d => d ? d.inv : null),
-        borderColor: colorByProject[proj],
-        backgroundColor: 'transparent',
-        borderWidth: 2.5,
-        pointRadius: 4,
-        pointBackgroundColor: colorByProject[proj],
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        tension: 0.35,
-        spanGaps: false,
-      })),
+      .flatMap((proj, idx) => {
+        const color = colorByProject[proj]
+        const lineDataset = {
+          type: 'line',
+          label: proj,
+          data: [...projectDataByPeriod[proj].map(d => d ? d.inv : null), null],
+          borderColor: color,
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: color,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          tension: 0.35,
+          spanGaps: false,
+        }
+        const avgDataset = {
+          type: 'line',
+          label: `${proj} (promedio)`,
+          data: [...periods.map(() => null), avgInvByProject[proj]],
+          showLine: false,
+          pointRadius: 7,
+          pointBackgroundColor: color,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          datalabels: { display: false },
+        }
+        return [lineDataset, avgDataset]
+      }),
   }
 
   // Gráfico de Avance
