@@ -25,6 +25,26 @@ function fmtAxis(v) {
   return v.toFixed(0)
 }
 
+function fmtCOP(v) {
+  if (v === null || v === undefined) return '-'
+  return '$ ' + Math.round(v).toLocaleString('es-CO')
+}
+
+// Presupuesto total (Ppto.) por proyecto
+const PROJECT_BUDGETS = {
+  '53 LIVING':         27477699037.18,
+  '63 LIVING':         43322405844.12,
+  ALBURA:              176016162712.33,
+  CORTTEZA:            114663016327.97,
+  FLORA:               134919714632.99,
+  MADERO:              102996550236.60,
+  NATIVA:              218221285049.31,
+  PIAZZA:              112750252904.11,
+  'RESERVA DEL LAGO':  54214479912.33,
+  TERRA:               97713675427.16,
+  TREZE:               59479490197.10,
+}
+
 const PROJECT_COLORS = {
   FLORA:   '#e08080',
   TERRA:   '#7ab366',
@@ -33,10 +53,26 @@ const PROJECT_COLORS = {
   MADERO:  '#a8a8a8',
 }
 
+// Colores distintos entre sí y de los fijos en PROJECT_COLORS (ninguno debe repetirse)
 const DEFAULT_COLORS = [
-  '#e08080', '#7ab366', '#8cc4e0', '#c9a8d9', '#a8a8a8',
-  '#f0a66a', '#6fb3d9', '#b8b8b8', '#d9a680', '#80d9b8',
+  '#f0a66a', '#e8c15c', '#5cb8a8', '#7f8fd9', '#d97fb0',
+  '#b8895c', '#a3d95c', '#5c7fd9', '#8f5cd9', '#5cd9b3',
 ]
+
+// Asigna un color estable por proyecto (independiente de filtros de año/etapa/selección)
+function buildColorMap(allProjects) {
+  const map = {}
+  let defaultIdx = 0
+  allProjects.forEach(proj => {
+    if (PROJECT_COLORS[proj]) {
+      map[proj] = PROJECT_COLORS[proj]
+    } else {
+      map[proj] = DEFAULT_COLORS[defaultIdx % DEFAULT_COLORS.length]
+      defaultIdx++
+    }
+  })
+  return map
+}
 
 const STAGES = ['Arranque', 'Ejecución', 'Cierre']
 const STAGE_RANGE_LABEL = {
@@ -56,6 +92,12 @@ export default function ComparativeChart({ data, selectedYears }) {
   const [selectedStages, setSelectedStages] = useState(() =>
     STAGES.reduce((acc, s) => { acc[s] = true; return acc }, {})
   )
+
+  // Color estable por proyecto, calculado sobre todos los proyectos del dataset (no cambia con filtros)
+  const colorByProject = useMemo(() => {
+    const allProjects = [...new Set(data.map(d => d.proyecto))].sort()
+    return buildColorMap(allProjects)
+  }, [data])
 
   // Etapa de cada proyecto según su último avance conocido (independiente del año filtrado)
   const stageByProject = useMemo(() => {
@@ -195,11 +237,11 @@ export default function ComparativeChart({ data, selectedYears }) {
         type: 'line',
         label: proj,
         data: projectDataByPeriod[proj].map(d => d ? d.inv : null),
-        borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        borderColor: colorByProject[proj],
         backgroundColor: 'transparent',
         borderWidth: 2.5,
         pointRadius: 4,
-        pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        pointBackgroundColor: colorByProject[proj],
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         tension: 0.35,
@@ -216,11 +258,11 @@ export default function ComparativeChart({ data, selectedYears }) {
         type: 'line',
         label: proj,
         data: projectDataByPeriod[proj].map(d => d ? d.avance : null),
-        borderColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        borderColor: colorByProject[proj],
         backgroundColor: 'transparent',
         borderWidth: 2.5,
         pointRadius: 4,
-        pointBackgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+        pointBackgroundColor: colorByProject[proj],
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
         tension: 0.35,
@@ -293,7 +335,7 @@ export default function ComparativeChart({ data, selectedYears }) {
           align: 'right',
           offset: 10,
           backgroundColor(ctx) {
-            return PROJECT_COLORS[ctx.dataset.label] || DEFAULT_COLORS[ctx.datasetIndex % DEFAULT_COLORS.length]
+            return colorByProject[ctx.dataset.label]
           },
           borderRadius: 2,
           padding: { top: 1, bottom: 1, left: 3, right: 3 },
@@ -397,7 +439,7 @@ export default function ComparativeChart({ data, selectedYears }) {
               <span className={styles.filterLabel}>{proj}</span>
               <span
                 className={styles.colorDot}
-                style={{ backgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[projects.indexOf(proj) % DEFAULT_COLORS.length] }}
+                style={{ backgroundColor: colorByProject[proj] }}
               />
             </label>
           ))}
@@ -462,7 +504,7 @@ export default function ComparativeChart({ data, selectedYears }) {
                 <span
                   className={styles.legendDot}
                   style={{
-                    backgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+                    backgroundColor: colorByProject[proj],
                     opacity: visibleDatasets[`inventory-${proj}`] !== false ? 1 : 0.3,
                   }}
                 />
@@ -475,6 +517,28 @@ export default function ComparativeChart({ data, selectedYears }) {
               </div>
             ))}
           </div>
+
+          <table className={styles.budgetTable}>
+            <thead>
+              <tr>
+                <th>Proyecto</th>
+                <th>Presupuesto Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activeProjects.map(proj => (
+                <tr key={proj}>
+                  <td>
+                    <span className={styles.budgetTableProject}>
+                      <span className={styles.legendDot} style={{ backgroundColor: colorByProject[proj] }} />
+                      {proj}
+                    </span>
+                  </td>
+                  <td>{fmtCOP(PROJECT_BUDGETS[proj])}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         <div className={styles.chartCard}>
@@ -504,7 +568,7 @@ export default function ComparativeChart({ data, selectedYears }) {
                 <span
                   className={styles.legendDot}
                   style={{
-                    backgroundColor: PROJECT_COLORS[proj] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length],
+                    backgroundColor: colorByProject[proj],
                     opacity: visibleDatasets[`advance-${proj}`] !== false ? 1 : 0.3,
                   }}
                 />

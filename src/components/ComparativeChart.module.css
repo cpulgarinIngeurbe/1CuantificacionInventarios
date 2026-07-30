@@ -249,6 +249,42 @@
   user-select: none;
 }
 
+.budgetTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e8e4df;
+  font-size: 0.78rem;
+}
+
+.budgetTable th {
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #2d5a3d;
+  padding: 6px 8px;
+}
+
+.budgetTable th:last-child,
+.budgetTable td:last-child {
+  text-align: right;
+}
+
+.budgetTable td {
+  padding: 6px 8px;
+  border-top: 1px solid #f0ebe4;
+  color: #2c2620;
+}
+
+.budgetTableProject {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .tooltip {
   position: absolute;
   bottom: 100%;
