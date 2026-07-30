@@ -556,33 +556,35 @@ export default function ComparativeChart({ data, selectedYears }) {
               ⛶
             </button>
           </div>
-          <div className={styles.chartWrap}>
-            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
-          </div>
-          <div className={styles.customLegend}>
-            {activeProjects.map((proj, idx) => (
-              <div
-                key={proj}
-                className={styles.legendItem}
-                onClick={() => toggleDataset(`inventory-${proj}`)}
-                onMouseEnter={() => setHoveredLegend(`inventory-${proj}`)}
-                onMouseLeave={() => setHoveredLegend(null)}
-              >
-                <span
-                  className={styles.legendDot}
-                  style={{
-                    backgroundColor: colorByProject[proj],
-                    opacity: visibleDatasets[`inventory-${proj}`] !== false ? 1 : 0.3,
-                  }}
-                />
-                <span className={styles.legendText}>{proj}</span>
-                {hoveredLegend === `inventory-${proj}` && (
-                  <div className={styles.tooltip}>
-                    {proj}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className={styles.chartBody}>
+            <div className={styles.sideLegend}>
+              {activeProjects.map((proj, idx) => (
+                <div
+                  key={proj}
+                  className={styles.legendItem}
+                  onClick={() => toggleDataset(`inventory-${proj}`)}
+                  onMouseEnter={() => setHoveredLegend(`inventory-${proj}`)}
+                  onMouseLeave={() => setHoveredLegend(null)}
+                >
+                  <span
+                    className={styles.legendDot}
+                    style={{
+                      backgroundColor: colorByProject[proj],
+                      opacity: visibleDatasets[`inventory-${proj}`] !== false ? 1 : 0.3,
+                    }}
+                  />
+                  <span className={styles.legendText}>{proj}</span>
+                  {hoveredLegend === `inventory-${proj}` && (
+                    <div className={styles.tooltip}>
+                      {proj}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className={styles.chartWrap}>
+              <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
+            </div>
           </div>
 
           <table className={styles.budgetTable}>
@@ -620,33 +622,35 @@ export default function ComparativeChart({ data, selectedYears }) {
               ⛶
             </button>
           </div>
-          <div className={styles.chartWrap}>
-            <Chart ref={advanceChartRef} type="line" data={advanceChartData} options={advanceOptions} />
-          </div>
-          <div className={styles.customLegend}>
-            {activeProjects.map((proj, idx) => (
-              <div
-                key={proj}
-                className={styles.legendItem}
-                onClick={() => toggleDataset(`advance-${proj}`)}
-                onMouseEnter={() => setHoveredLegend(`advance-${proj}`)}
-                onMouseLeave={() => setHoveredLegend(null)}
-              >
-                <span
-                  className={styles.legendDot}
-                  style={{
-                    backgroundColor: colorByProject[proj],
-                    opacity: visibleDatasets[`advance-${proj}`] !== false ? 1 : 0.3,
-                  }}
-                />
-                <span className={styles.legendText}>{proj}</span>
-                {hoveredLegend === `advance-${proj}` && (
-                  <div className={styles.tooltip}>
-                    {proj}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className={styles.chartBody}>
+            <div className={styles.chartWrap}>
+              <Chart ref={advanceChartRef} type="line" data={advanceChartData} options={advanceOptions} />
+            </div>
+            <div className={styles.sideLegend}>
+              {activeProjects.map((proj, idx) => (
+                <div
+                  key={proj}
+                  className={styles.legendItem}
+                  onClick={() => toggleDataset(`advance-${proj}`)}
+                  onMouseEnter={() => setHoveredLegend(`advance-${proj}`)}
+                  onMouseLeave={() => setHoveredLegend(null)}
+                >
+                  <span
+                    className={styles.legendDot}
+                    style={{
+                      backgroundColor: colorByProject[proj],
+                      opacity: visibleDatasets[`advance-${proj}`] !== false ? 1 : 0.3,
+                    }}
+                  />
+                  <span className={styles.legendText}>{proj}</span>
+                  {hoveredLegend === `advance-${proj}` && (
+                    <div className={styles.tooltip}>
+                      {proj}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
