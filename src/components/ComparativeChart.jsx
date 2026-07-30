@@ -243,7 +243,7 @@ export default function ComparativeChart({ data, selectedYears }) {
 
   // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto,
   // separada del resto por columnas vacías para que quede bien a la derecha)
-  const AVG_GAP_COLUMNS = 4
+  const AVG_GAP_COLUMNS = 12
   const gapLabels = Array(AVG_GAP_COLUMNS).fill('')
   const gapNulls = Array(AVG_GAP_COLUMNS).fill(null)
   const inventoryLabels = [...periods.map(p => p.label), ...gapLabels, 'Prom.']
