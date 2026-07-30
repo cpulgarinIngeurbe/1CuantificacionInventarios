@@ -241,8 +241,12 @@ export default function ComparativeChart({ data, selectedYears }) {
     }))
   }
 
-  // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto)
-  const inventoryLabels = [...periods.map(p => p.label), 'Prom.']
+  // Gráfico de Inventario (agrega una columna final "Prom." con el promedio de cada proyecto,
+  // separada del resto por columnas vacías para que quede bien a la derecha)
+  const AVG_GAP_COLUMNS = 4
+  const gapLabels = Array(AVG_GAP_COLUMNS).fill('')
+  const gapNulls = Array(AVG_GAP_COLUMNS).fill(null)
+  const inventoryLabels = [...periods.map(p => p.label), ...gapLabels, 'Prom.']
   const inventoryChartData = {
     labels: inventoryLabels,
     datasets: activeProjects
@@ -252,7 +256,7 @@ export default function ComparativeChart({ data, selectedYears }) {
         const lineDataset = {
           type: 'line',
           label: proj,
-          data: [...projectDataByPeriod[proj].map(d => d ? d.inv : null), null],
+          data: [...projectDataByPeriod[proj].map(d => d ? d.inv : null), ...gapNulls, null],
           borderColor: color,
           backgroundColor: 'transparent',
           borderWidth: 2.5,
@@ -266,7 +270,7 @@ export default function ComparativeChart({ data, selectedYears }) {
         const avgDataset = {
           type: 'line',
           label: `${proj} (promedio)`,
-          data: [...periods.map(() => null), avgInvByProject[proj]],
+          data: [...periods.map(() => null), ...gapNulls, avgInvByProject[proj]],
           showLine: false,
           pointRadius: 7,
           pointBackgroundColor: color,
