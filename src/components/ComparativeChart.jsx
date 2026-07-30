@@ -30,6 +30,49 @@ function fmtCOP(v) {
   return '$ ' + Math.round(v).toLocaleString('es-CO')
 }
 
+// Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
+// `plugins` en el montaje inicial, así que los datos a dibujar viajan por `options.plugins.avgMarkers`,
+// que sí se actualiza en cada render y llega "fresco" a este hook en cada dibujo.
+const avgMarkersPlugin = {
+  id: 'avgMarkers',
+  afterDatasetsDraw(chart, _args, pluginOptions) {
+    const markers = (pluginOptions && pluginOptions.markers) || []
+    const scaleY = chart.scales && chart.scales.y
+    if (!scaleY || markers.length === 0) return
+    const { ctx, chartArea } = chart
+    const x = chartArea.right + 210
+    const MIN_GAP = 18
+
+    const items = markers
+      .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
+      .sort((a, b) => a.rawY - b.rawY)
+
+    let prevY = -Infinity
+    items.forEach(item => {
+      item.y = Math.max(item.rawY, prevY + MIN_GAP)
+      prevY = item.y
+    })
+
+    ctx.save()
+    items.forEach(item => {
+      ctx.beginPath()
+      ctx.arc(x, item.y, 6, 0, Math.PI * 2)
+      ctx.fillStyle = item.color
+      ctx.fill()
+      ctx.lineWidth = 1.5
+      ctx.strokeStyle = '#ffffff'
+      ctx.stroke()
+
+      ctx.fillStyle = '#2c2620'
+      ctx.font = "600 10px 'Inter', sans-serif"
+      ctx.textBaseline = 'middle'
+      ctx.textAlign = 'left'
+      ctx.fillText(fmtCOP(item.value), x + 11, item.y)
+    })
+    ctx.restore()
+  },
+}
+
 // Presupuesto total (Ppto.) por proyecto
 const PROJECT_BUDGETS = {
   '53 LIVING':         27477699037.18,
@@ -270,45 +313,6 @@ export default function ComparativeChart({ data, selectedYears }) {
     .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
     .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
 
-  const avgMarkersPlugin = {
-    id: 'avgMarkers',
-    afterDatasetsDraw(chart) {
-      const scaleY = chart.scales && chart.scales.y
-      if (!scaleY || avgMarkerColumn.length === 0) return
-      const { ctx, chartArea } = chart
-      const x = chartArea.right + 200
-      const MIN_GAP = 18
-
-      const items = avgMarkerColumn
-        .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
-        .sort((a, b) => a.rawY - b.rawY)
-
-      let prevY = -Infinity
-      items.forEach(item => {
-        item.y = Math.max(item.rawY, prevY + MIN_GAP)
-        prevY = item.y
-      })
-
-      ctx.save()
-      items.forEach(item => {
-        ctx.beginPath()
-        ctx.arc(x, item.y, 6, 0, Math.PI * 2)
-        ctx.fillStyle = item.color
-        ctx.fill()
-        ctx.lineWidth = 1.5
-        ctx.strokeStyle = '#ffffff'
-        ctx.stroke()
-
-        ctx.fillStyle = '#2c2620'
-        ctx.font = "600 10px 'Inter', sans-serif"
-        ctx.textBaseline = 'middle'
-        ctx.textAlign = 'left'
-        ctx.fillText(fmtAxis(item.value), x + 11, item.y)
-      })
-      ctx.restore()
-    },
-  }
-
   // Gráfico de Avance
   const advanceChartData = {
     labels: periods.map(p => p.label),
@@ -335,7 +339,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: chartType === 'inventory' ? 280 : 150 } },
+      layout: { padding: { top: 20, right: chartType === 'inventory' ? 340 : 150 } },
       plugins: {
         legend: {
           display: false,
@@ -457,6 +461,7 @@ export default function ComparativeChart({ data, selectedYears }) {
   }
 
   const inventoryOptions = createChartOptions('inventory')
+  inventoryOptions.plugins.avgMarkers = { markers: avgMarkerColumn }
   const advanceOptions = createChartOptions('advance')
 
   return (
