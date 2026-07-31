@@ -48,17 +48,32 @@ const avgMarkersPlugin = {
     if (!scaleY || markers.length === 0) return
     const { ctx, chartArea } = chart
     const dotX = chartArea.right + 120
-    const MIN_GAP = 28
+    const available = chartArea.bottom - chartArea.top
+    const MIN_GAP = markers.length > 1 ? Math.min(28, available / (markers.length - 1)) : 28
 
     const items = markers
       .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
       .sort((a, b) => a.rawY - b.rawY)
 
+    // Pasada hacia abajo: separa los que están muy juntos
     let prevY = -Infinity
     items.forEach(item => {
       item.y = Math.max(item.rawY, prevY + MIN_GAP)
       prevY = item.y
     })
+
+    // Pasada hacia arriba: si algo quedó fuera del área del gráfico, comprime
+    // manteniendo el orden y el espacio mínimo, sin desbordar los límites.
+    if (items.length) {
+      const last = items[items.length - 1]
+      if (last.y > chartArea.bottom - 10) last.y = chartArea.bottom - 10
+      for (let i = items.length - 2; i >= 0; i--) {
+        if (items[i].y > items[i + 1].y - MIN_GAP) {
+          items[i].y = items[i + 1].y - MIN_GAP
+        }
+      }
+      if (items[0].y < chartArea.top + 8) items[0].y = chartArea.top + 8
+    }
 
     ctx.save()
     ctx.fillStyle = '#2d5a3d'
