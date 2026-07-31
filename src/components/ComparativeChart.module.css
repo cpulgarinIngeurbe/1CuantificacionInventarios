@@ -268,8 +268,8 @@
   padding: 6px 8px;
 }
 
-.budgetTable th:last-child,
-.budgetTable td:last-child {
+.budgetTable th:not(:first-child),
+.budgetTable td:not(:first-child) {
   text-align: right;
 }
 
@@ -283,6 +283,52 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.monthlyTableWrap {
+  overflow-x: auto;
+}
+
+.monthlyTable {
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.monthlyTable th {
+  text-align: right;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #2d5a3d;
+  padding: 6px 10px;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+}
+
+.monthlyTable th:first-child,
+.monthlyTable td:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: #ffffff;
+  z-index: 1;
+}
+
+.monthlyTable td {
+  text-align: right;
+  padding: 6px 10px;
+  border-top: 1px solid #f0ebe4;
+  color: #2c2620;
+}
+
+.subtotalRow td {
+  font-weight: 700;
+  color: #2d5a3d;
+  border-top: 2px solid #2d5a3d;
+  background: #f9f7f4;
 }
 
 .tooltip {

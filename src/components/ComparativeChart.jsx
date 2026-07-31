@@ -30,6 +30,11 @@ function fmtCOP(v) {
   return '$ ' + Math.round(v).toLocaleString('es-CO')
 }
 
+function fmtRatio(v) {
+  if (v === null || v === undefined || !isFinite(v)) return '-'
+  return v.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 // Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
 // `plugins` en el montaje inicial, así que los datos a dibujar viajan por `options.plugins.avgMarkers`,
 // que sí se actualiza en cada render y llega "fresco" a este hook en cada dibujo.
@@ -56,6 +61,12 @@ const avgMarkersPlugin = {
     })
 
     ctx.save()
+    ctx.fillStyle = '#2d5a3d'
+    ctx.font = "700 10px 'Inter', sans-serif"
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillText('PROMEDIO DE INVENTARIO', dotX - 6, chartArea.top - 6)
+
     items.forEach(item => {
       ctx.beginPath()
       ctx.arc(dotX, item.y, 6, 0, Math.PI * 2)
@@ -286,11 +297,13 @@ export default function ComparativeChart({ data, selectedYears }) {
     }))
   }
 
+  // Proyectos visibles en el gráfico de Inventario (misma selección para la tabla mensual)
+  const monthlyTableProjects = activeProjects.filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
+
   // Gráfico de Inventario
   const inventoryChartData = {
     labels: periods.map(p => p.label),
-    datasets: activeProjects
-      .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
+    datasets: monthlyTableProjects
       .map(proj => ({
         type: 'line',
         label: proj,
@@ -341,7 +354,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: 20, right: chartType === 'inventory' ? 460 : 150 } },
+      layout: { padding: { top: chartType === 'inventory' ? 34 : 20, right: chartType === 'inventory' ? 460 : 150 } },
       plugins: {
         legend: {
           display: false,
@@ -590,20 +603,29 @@ export default function ComparativeChart({ data, selectedYears }) {
               <tr>
                 <th>Proyecto</th>
                 <th>Presupuesto Total</th>
+                <th>Promedio de Inventario</th>
+                <th>Presupuesto Total / Promedio de Inventario</th>
               </tr>
             </thead>
             <tbody>
-              {activeProjects.map(proj => (
-                <tr key={proj}>
-                  <td>
-                    <span className={styles.budgetTableProject}>
-                      <span className={styles.legendDot} style={{ backgroundColor: colorByProject[proj] }} />
-                      {proj}
-                    </span>
-                  </td>
-                  <td>{fmtCOP(PROJECT_BUDGETS[proj])}</td>
-                </tr>
-              ))}
+              {activeProjects.map(proj => {
+                const budget = PROJECT_BUDGETS[proj]
+                const avgInv = avgInvByProject[proj]
+                const ratio = (budget !== undefined && avgInv) ? budget / avgInv : null
+                return (
+                  <tr key={proj}>
+                    <td>
+                      <span className={styles.budgetTableProject}>
+                        <span className={styles.legendDot} style={{ backgroundColor: colorByProject[proj] }} />
+                        {proj}
+                      </span>
+                    </td>
+                    <td>{fmtCOP(budget)}</td>
+                    <td>{fmtCOP(avgInv)}</td>
+                    <td>{fmtRatio(ratio)}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -648,6 +670,47 @@ export default function ComparativeChart({ data, selectedYears }) {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className={styles.filterSection}>
+        <div className={styles.filterHeader}>
+          <label className={styles.filterTitle}>Inventario Mensual por Proyecto (COP)</label>
+        </div>
+        <div className={styles.monthlyTableWrap}>
+          <table className={styles.monthlyTable}>
+            <thead>
+              <tr>
+                <th>Proyecto</th>
+                {periods.map(p => <th key={p.key}>{p.label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {monthlyTableProjects.map(proj => (
+                <tr key={proj}>
+                  <td>
+                    <span className={styles.budgetTableProject}>
+                      <span className={styles.legendDot} style={{ backgroundColor: colorByProject[proj] }} />
+                      {proj}
+                    </span>
+                  </td>
+                  {projectDataByPeriod[proj].map((d, i) => (
+                    <td key={i}>{d && d.inv !== null && d.inv !== undefined ? fmtCOP(d.inv) : '-'}</td>
+                  ))}
+                </tr>
+              ))}
+              <tr className={styles.subtotalRow}>
+                <td>Subtotal</td>
+                {periods.map((p, i) => {
+                  const sum = monthlyTableProjects.reduce((acc, proj) => {
+                    const d = projectDataByPeriod[proj][i]
+                    return (d && d.inv !== null && d.inv !== undefined) ? acc + d.inv : acc
+                  }, 0)
+                  return <td key={p.key}>{fmtCOP(sum)}</td>
+                })}
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
