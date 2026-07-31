@@ -98,6 +98,7 @@ const PROJECT_BUDGETS = {
   PIAZZA:              112750252904.11,
   'RESERVA DEL LAGO':  54214479912.33,
   TERRA:               97713675427.16,
+  VIALE:               55599507194,
   TREZE:               59479490197.10,
 }
 
