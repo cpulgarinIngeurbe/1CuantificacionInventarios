@@ -47,8 +47,8 @@ const avgMarkersPlugin = {
     const scaleY = chart.scales && chart.scales.y
     if (!scaleY || markers.length === 0) return
     const { ctx, chartArea } = chart
-    const dotX = chartArea.right + 210
-    const MIN_GAP = 18
+    const dotX = chartArea.right + 120
+    const MIN_GAP = 28
 
     const items = markers
       .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
@@ -62,25 +62,29 @@ const avgMarkersPlugin = {
 
     ctx.save()
     ctx.fillStyle = '#2d5a3d'
-    ctx.font = "700 10px 'Inter', sans-serif"
+    ctx.font = "700 9px 'Inter', sans-serif"
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
     ctx.fillText('PROMEDIO DE INVENTARIO', dotX - 6, chartArea.top - 6)
 
     items.forEach(item => {
       ctx.beginPath()
-      ctx.arc(dotX, item.y, 6, 0, Math.PI * 2)
+      ctx.arc(dotX, item.y, 5, 0, Math.PI * 2)
       ctx.fillStyle = item.color
       ctx.fill()
       ctx.lineWidth = 1.5
       ctx.strokeStyle = '#ffffff'
       ctx.stroke()
 
-      ctx.fillStyle = '#2c2620'
-      ctx.font = "600 10px 'Inter', sans-serif"
-      ctx.textBaseline = 'middle'
       ctx.textAlign = 'left'
-      ctx.fillText(`${item.proj}  ${fmtCOP(item.value)}`, dotX + 11, item.y)
+      ctx.fillStyle = '#2c2620'
+      ctx.font = "700 9px 'Inter', sans-serif"
+      ctx.textBaseline = 'alphabetic'
+      ctx.fillText(item.proj, dotX + 9, item.y - 3)
+
+      ctx.fillStyle = '#7a7269'
+      ctx.font = "500 9px 'Inter', sans-serif"
+      ctx.fillText(fmtCOP(item.value), dotX + 9, item.y + 9)
     })
     ctx.restore()
   },
@@ -311,8 +315,8 @@ export default function ComparativeChart({ data, selectedYears }) {
         data: projectDataByPeriod[proj].map(d => d ? d.inv : null),
         borderColor: colorByProject[proj],
         backgroundColor: 'transparent',
-        borderWidth: 2.5,
-        pointRadius: 4,
+        borderWidth: 2,
+        pointRadius: 2.5,
         pointBackgroundColor: colorByProject[proj],
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
@@ -355,7 +359,7 @@ export default function ComparativeChart({ data, selectedYears }) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
-      layout: { padding: { top: chartType === 'inventory' ? 34 : 20, right: chartType === 'inventory' ? 460 : 150 } },
+      layout: { padding: { top: chartType === 'inventory' ? 34 : 20, right: chartType === 'inventory' ? 260 : 150 } },
       plugins: {
         legend: {
           display: false,
