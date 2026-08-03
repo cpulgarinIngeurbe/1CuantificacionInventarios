@@ -30,9 +30,9 @@ function fmtCOP(v) {
   return '$ ' + Math.round(v).toLocaleString('es-CO')
 }
 
-function fmtRatio(v) {
+function fmtPercent(v) {
   if (v === null || v === undefined || !isFinite(v)) return '-'
-  return v.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return (v * 100).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%'
 }
 
 // Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
@@ -624,14 +624,14 @@ export default function ComparativeChart({ data, selectedYears }) {
                 <th>Proyecto</th>
                 <th>Presupuesto Total</th>
                 <th>Promedio de Inventario</th>
-                <th>Presupuesto Total / Promedio de Inventario</th>
+                <th>Promedio de Inventario / Presupuesto Total</th>
               </tr>
             </thead>
             <tbody>
               {activeProjects.map(proj => {
                 const budget = PROJECT_BUDGETS[proj]
                 const avgInv = avgInvByProject[proj]
-                const ratio = (budget !== undefined && avgInv) ? budget / avgInv : null
+                const ratio = (budget) ? avgInv / budget : null
                 return (
                   <tr key={proj}>
                     <td>
@@ -642,7 +642,7 @@ export default function ComparativeChart({ data, selectedYears }) {
                     </td>
                     <td>{fmtCOP(budget)}</td>
                     <td>{fmtCOP(avgInv)}</td>
-                    <td>{fmtRatio(ratio)}</td>
+                    <td>{fmtPercent(ratio)}</td>
                   </tr>
                 )
               })}
