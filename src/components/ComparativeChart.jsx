@@ -631,7 +631,7 @@ export default function ComparativeChart({ data, selectedYears }) {
               {activeProjects.map(proj => {
                 const budget = PROJECT_BUDGETS[proj]
                 const avgInv = avgInvByProject[proj]
-                const ratio = (budget) ? avgInv / budget : null
+                const ratio = (budget && avgInv !== null && avgInv !== undefined) ? avgInv / budget : null
                 return (
                   <tr key={proj}>
                     <td>
