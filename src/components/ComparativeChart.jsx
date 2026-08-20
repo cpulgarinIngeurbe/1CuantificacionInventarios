@@ -295,8 +295,7 @@ export default function ComparativeChart({ data, selectedYears }) {
     const activeProjects = projects.filter(p => selectedProjects[p])
     setVisibleDatasets(
       activeProjects.reduce((acc, proj) => {
-        acc[`inventory-${proj}`] = true
-        acc[`advance-${proj}`] = true
+        acc[proj] = true
         return acc
       }, {})
     )
@@ -359,7 +358,7 @@ export default function ComparativeChart({ data, selectedYears }) {
   }
 
   // Proyectos visibles en el gráfico de Inventario (misma selección para la tabla mensual)
-  const monthlyTableProjects = activeProjects.filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
+  const monthlyTableProjects = activeProjects.filter(proj => visibleDatasets[proj] !== false)
 
   // Gráfico de Inventario
   const inventoryChartData = {
@@ -385,7 +384,7 @@ export default function ComparativeChart({ data, selectedYears }) {
   // (misma escala que las curvas), separada a la derecha de las etiquetas de fin de curva,
   // y con un mínimo de espacio vertical entre círculos para que no se superpongan entre sí.
   const avgMarkerColumn = activeProjects
-    .filter(proj => visibleDatasets[`inventory-${proj}`] !== false)
+    .filter(proj => visibleDatasets[proj] !== false)
     .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
     .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
 
@@ -393,7 +392,7 @@ export default function ComparativeChart({ data, selectedYears }) {
   const advanceChartData = {
     labels: periods.map(p => p.label),
     datasets: activeProjects
-      .filter(proj => visibleDatasets[`advance-${proj}`] !== false)
+      .filter(proj => visibleDatasets[proj] !== false)
       .map((proj, idx) => ({
         type: 'line',
         label: proj,
@@ -612,14 +611,14 @@ export default function ComparativeChart({ data, selectedYears }) {
                       </span>
                     )}
                     {expandedMarkerLayout.items.map(item => {
-                      const visible = visibleDatasets[`inventory-${item.proj}`] !== false
+                      const visible = visibleDatasets[item.proj] !== false
                       return (
                         <button
                           key={item.proj}
                           type="button"
                           className={styles.avgMarkerItem}
                           style={{ left: expandedMarkerLayout.x, top: item.y, opacity: visible ? 1 : 0.35 }}
-                          onClick={() => toggleDataset(`inventory-${item.proj}`)}
+                          onClick={() => toggleDataset(item.proj)}
                           title={visible ? `Ocultar ${item.proj}` : `Mostrar ${item.proj}`}
                         >
                           <span className={styles.avgMarkerDot} style={{ backgroundColor: item.color }} />
@@ -667,7 +666,7 @@ export default function ComparativeChart({ data, selectedYears }) {
               <div
                 key={proj}
                 className={styles.legendItem}
-                onClick={() => toggleDataset(`inventory-${proj}`)}
+                onClick={() => toggleDataset(proj)}
                 onMouseEnter={() => setHoveredLegend(`inventory-${proj}`)}
                 onMouseLeave={() => setHoveredLegend(null)}
               >
@@ -675,7 +674,7 @@ export default function ComparativeChart({ data, selectedYears }) {
                   className={styles.legendDot}
                   style={{
                     backgroundColor: colorByProject[proj],
-                    opacity: visibleDatasets[`inventory-${proj}`] !== false ? 1 : 0.3,
+                    opacity: visibleDatasets[proj] !== false ? 1 : 0.3,
                   }}
                 />
                 <span className={styles.legendText}>{proj}</span>
@@ -740,7 +739,7 @@ export default function ComparativeChart({ data, selectedYears }) {
               <div
                 key={proj}
                 className={styles.legendItem}
-                onClick={() => toggleDataset(`advance-${proj}`)}
+                onClick={() => toggleDataset(proj)}
                 onMouseEnter={() => setHoveredLegend(`advance-${proj}`)}
                 onMouseLeave={() => setHoveredLegend(null)}
               >
@@ -748,7 +747,7 @@ export default function ComparativeChart({ data, selectedYears }) {
                   className={styles.legendDot}
                   style={{
                     backgroundColor: colorByProject[proj],
-                    opacity: visibleDatasets[`advance-${proj}`] !== false ? 1 : 0.3,
+                    opacity: visibleDatasets[proj] !== false ? 1 : 0.3,
                   }}
                 />
                 <span className={styles.legendText}>{proj}</span>
