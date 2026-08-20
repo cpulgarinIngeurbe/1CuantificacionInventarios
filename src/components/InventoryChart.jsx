@@ -47,7 +47,8 @@ const C = {
 }
 
 export default function InventoryChart({ rows }) {
-  const [hiddenSets, setHiddenSets] = useState({})
+  // Entradas (0) y Salidas (1) inician ocultas; el usuario puede reactivarlas desde la leyenda.
+  const [hiddenSets, setHiddenSets] = useState({ 0: true, 1: true })
 
   const toggleSet = (key) => {
     setHiddenSets(prev => ({ ...prev, [key]: !prev[key] }))
