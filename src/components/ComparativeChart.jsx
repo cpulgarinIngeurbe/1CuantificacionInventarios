@@ -76,45 +76,57 @@ function computeMarkerLayout(chart, markers) {
   return { x: dotX, titleY: chartArea.top - 6, items }
 }
 
-// Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
-// `plugins` en el montaje inicial, así que los datos a dibujar viajan por `options.plugins.avgMarkers`,
-// que sí se actualiza en cada render y llega "fresco" a este hook en cada dibujo.
-const avgMarkersPlugin = {
-  id: 'avgMarkers',
-  afterDatasetsDraw(chart, _args, pluginOptions) {
-    const markers = (pluginOptions && pluginOptions.markers) || []
-    const { x: dotX, titleY, items } = computeMarkerLayout(chart, markers)
-    if (items.length === 0) return
-    const { ctx } = chart
+// Listado interactivo de "Promedio de Inventario": se apoya sobre el mismo eje Y real
+// del gráfico (vía computeMarkerLayout) para posicionarse en HTML sobre el canvas, tanto
+// en la vista compacta como en la ampliada, así el clic para ocultar/mostrar un proyecto
+// funciona en cualquiera de las dos sin tener que abrir el gráfico ampliado.
+function AvgMarkersOverlay({ chartRef, markers, visibleDatasets, onToggle }) {
+  const [layout, setLayout] = useState({ x: 0, titleY: 0, items: [] })
 
-    ctx.save()
-    ctx.fillStyle = '#2d5a3d'
-    ctx.font = "700 9px 'Inter', sans-serif"
-    ctx.textAlign = 'left'
-    ctx.textBaseline = 'alphabetic'
-    ctx.fillText('PROMEDIO DE INVENTARIO', dotX - 6, titleY)
+  useEffect(() => {
+    const chart = chartRef.current
+    if (!chart) return
+    const recompute = () => setLayout(computeMarkerLayout(chart, markers))
+    recompute()
+    const raf = requestAnimationFrame(recompute)
+    window.addEventListener('resize', recompute)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', recompute)
+    }
+  }, [chartRef, markers, visibleDatasets])
 
-    items.forEach(item => {
-      ctx.beginPath()
-      ctx.arc(dotX, item.y, 5, 0, Math.PI * 2)
-      ctx.fillStyle = item.color
-      ctx.fill()
-      ctx.lineWidth = 1.5
-      ctx.strokeStyle = '#ffffff'
-      ctx.stroke()
-
-      ctx.textAlign = 'left'
-      ctx.fillStyle = '#2c2620'
-      ctx.font = "700 9px 'Inter', sans-serif"
-      ctx.textBaseline = 'alphabetic'
-      ctx.fillText(item.proj, dotX + 9, item.y - 3)
-
-      ctx.fillStyle = '#7a7269'
-      ctx.font = "500 9px 'Inter', sans-serif"
-      ctx.fillText(fmtCOP(item.value), dotX + 9, item.y + 9)
-    })
-    ctx.restore()
-  },
+  return (
+    <div className={styles.avgMarkersOverlay}>
+      {layout.items.length > 0 && (
+        <span
+          className={styles.avgMarkersOverlayTitle}
+          style={{ left: layout.x - 6, top: layout.titleY }}
+        >
+          PROMEDIO DE INVENTARIO
+        </span>
+      )}
+      {layout.items.map(item => {
+        const visible = visibleDatasets[item.proj] !== false
+        return (
+          <button
+            key={item.proj}
+            type="button"
+            className={styles.avgMarkerItem}
+            style={{ left: layout.x, top: item.y, opacity: visible ? 1 : 0.35 }}
+            onClick={() => onToggle(item.proj)}
+            title={visible ? `Ocultar ${item.proj}` : `Mostrar ${item.proj}`}
+          >
+            <span className={styles.avgMarkerDot} style={{ backgroundColor: item.color }} />
+            <span className={styles.avgMarkerText}>
+              <span className={styles.avgMarkerName}>{item.proj}</span>
+              <span className={styles.avgMarkerValue}>{fmtCOP(item.value)}</span>
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
 }
 
 // Presupuesto total (Ppto.) por proyecto
@@ -275,7 +287,6 @@ export default function ComparativeChart({ data, selectedYears }) {
   const [visibleDatasets, setVisibleDatasets] = useState({})
   const [expandedChart, setExpandedChart] = useState(null)
   const [hoveredLegend, setHoveredLegend] = useState(null)
-  const [expandedMarkerLayout, setExpandedMarkerLayout] = useState({ x: 0, titleY: 0, items: [] })
   const inventoryChartRef = useRef(null)
   const advanceChartRef = useRef(null)
   const expandedInventoryChartRef = useRef(null)
@@ -301,32 +312,15 @@ export default function ComparativeChart({ data, selectedYears }) {
     )
   }, [selectedProjects, projects])
 
-  // Misma lista que avgMarkerColumn (más abajo) pero sin filtrar por visibilidad: la usa
-  // el listado interactivo del gráfico ampliado, donde un proyecto ocultado debe seguir
-  // apareciendo (atenuado) para poder volver a mostrarlo con otro clic.
+  // Proyectos con promedio de inventario calculado, para el listado interactivo
+  // "Promedio de Inventario" (compacto y ampliado). No se filtra por visibilidad: un
+  // proyecto oculto sigue apareciendo (atenuado) para poder volver a mostrarlo con un clic.
   const allMarkerItems = useMemo(() => {
     const active = projects.filter(p => selectedProjects[p])
     return active
       .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
       .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
   }, [projects, selectedProjects, avgInvByProject, colorByProject])
-
-  // Recalcula la posición del listado interactivo cuando se abre el modal ampliado,
-  // cuando cambia qué proyectos participan, o cuando se oculta/muestra una curva
-  // (el eje Y puede reacomodarse), y también al redimensionar la ventana.
-  useEffect(() => {
-    if (expandedChart !== 'inventory') return
-    const chart = expandedInventoryChartRef.current
-    if (!chart) return
-    const recompute = () => setExpandedMarkerLayout(computeMarkerLayout(chart, allMarkerItems))
-    recompute()
-    const raf = requestAnimationFrame(recompute)
-    window.addEventListener('resize', recompute)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('resize', recompute)
-    }
-  }, [expandedChart, allMarkerItems, visibleDatasets])
 
   if (data.length === 0) return null
 
@@ -379,14 +373,6 @@ export default function ComparativeChart({ data, selectedYears }) {
         spanGaps: false,
       })),
   }
-
-  // Columna de círculos de promedio: se dibuja directamente sobre el mismo eje Y del gráfico
-  // (misma escala que las curvas), separada a la derecha de las etiquetas de fin de curva,
-  // y con un mínimo de espacio vertical entre círculos para que no se superpongan entre sí.
-  const avgMarkerColumn = activeProjects
-    .filter(proj => visibleDatasets[proj] !== false)
-    .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
-    .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
 
   // Gráfico de Avance
   const advanceChartData = {
@@ -536,7 +522,6 @@ export default function ComparativeChart({ data, selectedYears }) {
   }
 
   const inventoryOptions = createChartOptions('inventory')
-  inventoryOptions.plugins.avgMarkers = { markers: avgMarkerColumn }
   const advanceOptions = createChartOptions('advance')
 
   return (
@@ -601,35 +586,12 @@ export default function ComparativeChart({ data, selectedYears }) {
                 <h3 className={styles.expandedTitle}>Inventario al cierre del mes (COP)</h3>
                 <div className={styles.expandedChartWrap}>
                   <Chart ref={expandedInventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
-                  <div className={styles.avgMarkersOverlay}>
-                    {expandedMarkerLayout.items.length > 0 && (
-                      <span
-                        className={styles.avgMarkersOverlayTitle}
-                        style={{ left: expandedMarkerLayout.x - 6, top: expandedMarkerLayout.titleY }}
-                      >
-                        PROMEDIO DE INVENTARIO
-                      </span>
-                    )}
-                    {expandedMarkerLayout.items.map(item => {
-                      const visible = visibleDatasets[item.proj] !== false
-                      return (
-                        <button
-                          key={item.proj}
-                          type="button"
-                          className={styles.avgMarkerItem}
-                          style={{ left: expandedMarkerLayout.x, top: item.y, opacity: visible ? 1 : 0.35 }}
-                          onClick={() => toggleDataset(item.proj)}
-                          title={visible ? `Ocultar ${item.proj}` : `Mostrar ${item.proj}`}
-                        >
-                          <span className={styles.avgMarkerDot} style={{ backgroundColor: item.color }} />
-                          <span className={styles.avgMarkerText}>
-                            <span className={styles.avgMarkerName}>{item.proj}</span>
-                            <span className={styles.avgMarkerValue}>{fmtCOP(item.value)}</span>
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
+                  <AvgMarkersOverlay
+                    chartRef={expandedInventoryChartRef}
+                    markers={allMarkerItems}
+                    visibleDatasets={visibleDatasets}
+                    onToggle={toggleDataset}
+                  />
                 </div>
               </>
             )}
@@ -659,7 +621,13 @@ export default function ComparativeChart({ data, selectedYears }) {
             </button>
           </div>
           <div className={styles.chartWrap}>
-            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
+            <Chart ref={inventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
+            <AvgMarkersOverlay
+              chartRef={inventoryChartRef}
+              markers={allMarkerItems}
+              visibleDatasets={visibleDatasets}
+              onToggle={toggleDataset}
+            />
           </div>
           <div className={styles.customLegend}>
             {activeProjects.map((proj, idx) => (
