@@ -206,6 +206,73 @@
   min-height: 0;
 }
 
+.avgMarkersOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.avgMarkersOverlayTitle {
+  position: absolute;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #2d5a3d;
+  white-space: nowrap;
+  transform: translateY(-100%);
+}
+
+.avgMarkerItem {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 4px;
+  transition: opacity 0.2s ease, background 0.15s ease;
+  font-family: inherit;
+}
+
+.avgMarkerItem:hover {
+  background: rgba(45, 90, 61, 0.08);
+}
+
+.avgMarkerDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.avgMarkerText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.avgMarkerName {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #2c2620;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.avgMarkerValue {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: #7a7269;
+  white-space: nowrap;
+  text-align: left;
+}
+
 .customLegend {
   display: flex;
   flex-wrap: wrap;

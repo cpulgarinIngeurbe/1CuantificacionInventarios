@@ -35,52 +35,64 @@ function fmtPercent(v) {
   return (v * 100).toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%'
 }
 
+// Calcula la posición en píxeles de cada marcador de promedio sobre el eje Y real
+// del gráfico, evitando que se superpongan verticalmente. Se usa tanto para dibujar
+// el listado sobre el canvas (vista compacta) como para posicionar el listado
+// interactivo en HTML (vista ampliada), así ambos quedan alineados entre sí.
+function computeMarkerLayout(chart, markers) {
+  const scaleY = chart && chart.scales && chart.scales.y
+  const chartArea = chart && chart.chartArea
+  if (!scaleY || !chartArea || markers.length === 0) {
+    return { x: 0, titleY: 0, items: [] }
+  }
+  const dotX = chartArea.right + 120
+  const available = chartArea.bottom - chartArea.top
+  const MIN_GAP = markers.length > 1 ? Math.min(28, available / (markers.length - 1)) : 28
+
+  const items = markers
+    .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
+    .sort((a, b) => a.rawY - b.rawY)
+
+  // Pasada hacia abajo: separa los que están muy juntos
+  let prevY = -Infinity
+  items.forEach(item => {
+    item.y = Math.max(item.rawY, prevY + MIN_GAP)
+    prevY = item.y
+  })
+
+  // Pasada hacia arriba: si algo quedó fuera del área del gráfico, comprime
+  // manteniendo el orden y el espacio mínimo, sin desbordar los límites.
+  if (items.length) {
+    const last = items[items.length - 1]
+    if (last.y > chartArea.bottom - 10) last.y = chartArea.bottom - 10
+    for (let i = items.length - 2; i >= 0; i--) {
+      if (items[i].y > items[i + 1].y - MIN_GAP) {
+        items[i].y = items[i + 1].y - MIN_GAP
+      }
+    }
+    if (items[0].y < chartArea.top + 8) items[0].y = chartArea.top + 8
+  }
+
+  return { x: dotX, titleY: chartArea.top - 6, items }
+}
+
 // Plugin estable (no se recrea en cada render): react-chartjs-2 solo registra el arreglo
 // `plugins` en el montaje inicial, así que los datos a dibujar viajan por `options.plugins.avgMarkers`,
 // que sí se actualiza en cada render y llega "fresco" a este hook en cada dibujo.
-// Cada círculo se posiciona en el valor real de su promedio sobre el mismo eje Y de las curvas,
-// con un mínimo de espacio vertical entre ellos para que no se superpongan.
 const avgMarkersPlugin = {
   id: 'avgMarkers',
   afterDatasetsDraw(chart, _args, pluginOptions) {
     const markers = (pluginOptions && pluginOptions.markers) || []
-    const scaleY = chart.scales && chart.scales.y
-    if (!scaleY || markers.length === 0) return
-    const { ctx, chartArea } = chart
-    const dotX = chartArea.right + 120
-    const available = chartArea.bottom - chartArea.top
-    const MIN_GAP = markers.length > 1 ? Math.min(28, available / (markers.length - 1)) : 28
-
-    const items = markers
-      .map(m => ({ ...m, rawY: scaleY.getPixelForValue(m.value) }))
-      .sort((a, b) => a.rawY - b.rawY)
-
-    // Pasada hacia abajo: separa los que están muy juntos
-    let prevY = -Infinity
-    items.forEach(item => {
-      item.y = Math.max(item.rawY, prevY + MIN_GAP)
-      prevY = item.y
-    })
-
-    // Pasada hacia arriba: si algo quedó fuera del área del gráfico, comprime
-    // manteniendo el orden y el espacio mínimo, sin desbordar los límites.
-    if (items.length) {
-      const last = items[items.length - 1]
-      if (last.y > chartArea.bottom - 10) last.y = chartArea.bottom - 10
-      for (let i = items.length - 2; i >= 0; i--) {
-        if (items[i].y > items[i + 1].y - MIN_GAP) {
-          items[i].y = items[i + 1].y - MIN_GAP
-        }
-      }
-      if (items[0].y < chartArea.top + 8) items[0].y = chartArea.top + 8
-    }
+    const { x: dotX, titleY, items } = computeMarkerLayout(chart, markers)
+    if (items.length === 0) return
+    const { ctx } = chart
 
     ctx.save()
     ctx.fillStyle = '#2d5a3d'
     ctx.font = "700 9px 'Inter', sans-serif"
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
-    ctx.fillText('PROMEDIO DE INVENTARIO', dotX - 6, chartArea.top - 6)
+    ctx.fillText('PROMEDIO DE INVENTARIO', dotX - 6, titleY)
 
     items.forEach(item => {
       ctx.beginPath()
@@ -263,8 +275,10 @@ export default function ComparativeChart({ data, selectedYears }) {
   const [visibleDatasets, setVisibleDatasets] = useState({})
   const [expandedChart, setExpandedChart] = useState(null)
   const [hoveredLegend, setHoveredLegend] = useState(null)
+  const [expandedMarkerLayout, setExpandedMarkerLayout] = useState({ x: 0, titleY: 0, items: [] })
   const inventoryChartRef = useRef(null)
   const advanceChartRef = useRef(null)
+  const expandedInventoryChartRef = useRef(null)
 
   // Sincronizar selectedProjects cuando cambien los proyectos
   useEffect(() => {
@@ -287,6 +301,33 @@ export default function ComparativeChart({ data, selectedYears }) {
       }, {})
     )
   }, [selectedProjects, projects])
+
+  // Misma lista que avgMarkerColumn (más abajo) pero sin filtrar por visibilidad: la usa
+  // el listado interactivo del gráfico ampliado, donde un proyecto ocultado debe seguir
+  // apareciendo (atenuado) para poder volver a mostrarlo con otro clic.
+  const allMarkerItems = useMemo(() => {
+    const active = projects.filter(p => selectedProjects[p])
+    return active
+      .filter(proj => avgInvByProject[proj] !== null && avgInvByProject[proj] !== undefined)
+      .map(proj => ({ proj, color: colorByProject[proj], value: avgInvByProject[proj] }))
+  }, [projects, selectedProjects, avgInvByProject, colorByProject])
+
+  // Recalcula la posición del listado interactivo cuando se abre el modal ampliado,
+  // cuando cambia qué proyectos participan, o cuando se oculta/muestra una curva
+  // (el eje Y puede reacomodarse), y también al redimensionar la ventana.
+  useEffect(() => {
+    if (expandedChart !== 'inventory') return
+    const chart = expandedInventoryChartRef.current
+    if (!chart) return
+    const recompute = () => setExpandedMarkerLayout(computeMarkerLayout(chart, allMarkerItems))
+    recompute()
+    const raf = requestAnimationFrame(recompute)
+    window.addEventListener('resize', recompute)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', recompute)
+    }
+  }, [expandedChart, allMarkerItems, visibleDatasets])
 
   if (data.length === 0) return null
 
@@ -560,7 +601,36 @@ export default function ComparativeChart({ data, selectedYears }) {
               <>
                 <h3 className={styles.expandedTitle}>Inventario al cierre del mes (COP)</h3>
                 <div className={styles.expandedChartWrap}>
-                  <Chart type="line" data={inventoryChartData} options={inventoryOptions} plugins={[avgMarkersPlugin]} />
+                  <Chart ref={expandedInventoryChartRef} type="line" data={inventoryChartData} options={inventoryOptions} />
+                  <div className={styles.avgMarkersOverlay}>
+                    {expandedMarkerLayout.items.length > 0 && (
+                      <span
+                        className={styles.avgMarkersOverlayTitle}
+                        style={{ left: expandedMarkerLayout.x - 6, top: expandedMarkerLayout.titleY }}
+                      >
+                        PROMEDIO DE INVENTARIO
+                      </span>
+                    )}
+                    {expandedMarkerLayout.items.map(item => {
+                      const visible = visibleDatasets[`inventory-${item.proj}`] !== false
+                      return (
+                        <button
+                          key={item.proj}
+                          type="button"
+                          className={styles.avgMarkerItem}
+                          style={{ left: expandedMarkerLayout.x, top: item.y, opacity: visible ? 1 : 0.35 }}
+                          onClick={() => toggleDataset(`inventory-${item.proj}`)}
+                          title={visible ? `Ocultar ${item.proj}` : `Mostrar ${item.proj}`}
+                        >
+                          <span className={styles.avgMarkerDot} style={{ backgroundColor: item.color }} />
+                          <span className={styles.avgMarkerText}>
+                            <span className={styles.avgMarkerName}>{item.proj}</span>
+                            <span className={styles.avgMarkerValue}>{fmtCOP(item.value)}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </>
             )}
